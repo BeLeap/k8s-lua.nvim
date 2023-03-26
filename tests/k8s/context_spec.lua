@@ -1,0 +1,6 @@
+describe("Test", function()
+	it("1", function()
+		print("test")
+		assert(1 + 1 == 2)
+	end)
+end)
