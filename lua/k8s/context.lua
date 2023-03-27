@@ -1,9 +1,12 @@
+local utils = require("k8s.utils")
+
 local M = {}
 
-local function read_config()
-	for line in vim.api.readfile("~/.kube/config") do
-		print(line)
-	end
+M.read_config = function()
+	local home = os.getenv("HOME")
+
+	local content = utils.readfile(home .. "/.kube/config")
+	print(content)
 end
 
 return M

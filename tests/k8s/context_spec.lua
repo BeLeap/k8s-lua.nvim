@@ -1,6 +1,7 @@
+local context = require("k8s.context")
+
 describe("Test", function()
 	it("1", function()
-		print("test")
-		assert(1 + 1 == 2)
+		context.read_config()
 	end)
 end)
