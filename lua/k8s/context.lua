@@ -1,11 +1,10 @@
 local utils = require("k8s.utils")
+local constants = require("k8s.constants")
 
 local M = {}
 
 M.read_config = function()
-	local home = os.getenv("HOME")
-
-	local content = utils.readfile(home .. "/.kube/config")
+	local content = utils.readfile(constants.kubeconfig)
 	print(content)
 end
 
