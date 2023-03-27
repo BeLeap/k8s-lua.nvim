@@ -13,10 +13,10 @@ local ensure_install = function(plugin)
 	vim.opt.runtimepath:append(plugin_dir)
 end
 
+vim.opt.runtimepath:append(".")
+
 ensure_install("nvim-lua/plenary.nvim")
 ensure_install("nvim-treesitter/nvim-treesitter")
-
-vim.opt.runtimepath:append(".")
 
 vim.cmd("runtime plugin/plenary.vim")
 require("plenary.busted")
