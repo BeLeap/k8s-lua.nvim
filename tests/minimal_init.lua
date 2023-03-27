@@ -6,7 +6,7 @@ local ensure_install = function(plugin)
 
 	local plugin_not_exists = vim.fn.isdirectory(plugin_dir) == 0
 	if plugin_not_exists then
-		print("Installing " .. plugin_name)
+		print("[INFO] Installing " .. plugin_name)
 		vim.fn.system({ "git", "clone", "https://github.com/" .. plugin, plugin_dir })
 	end
 
