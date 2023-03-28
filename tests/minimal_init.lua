@@ -18,5 +18,7 @@ vim.opt.runtimepath:append(".")
 ensure_install("nvim-lua/plenary.nvim")
 ensure_install("nvim-treesitter/nvim-treesitter")
 
+require("nvim-treesitter.install").commands.TSInstallSync["run"]("yaml")
+
 vim.cmd("runtime plugin/plenary.vim")
 require("plenary.busted")
