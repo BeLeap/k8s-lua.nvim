@@ -1,7 +1,5 @@
 local M = {}
 
-M.setup = function()
-	print("Hello, World!")
-end
+M.setup = function() end
 
 return M
