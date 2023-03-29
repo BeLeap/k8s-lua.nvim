@@ -1,12 +1,19 @@
 local utils = require("k8s.utils")
-local config = require("k8s").config
 
 -- @module context
 -- @alias M
+-- @field config config
 -- @field target_context target context
-local M = {}
+local M = {
+  config = {},
+}
 
-M.get = function()
+M.setup = function(config)
+  M.config.context = config.context
+end
+
+-- load contexts from config.kubeconfig_location
+M._get = function()
   local context_names_query = [[
   (document
     (block_node
@@ -37,7 +44,7 @@ M.get = function()
   )
   ]]
 
-  local content = utils.readfile(config.kubeconfig_location)
+  local content = utils.readfile(vim.fs.normalize(M.config.context.location))
 
   vim.treesitter.language.add("yaml")
   local parser = vim.treesitter.get_string_parser(content, "yaml")
@@ -54,12 +61,14 @@ M.get = function()
   return contexts
 end
 
+-- select context with vim.ui.select
 M.select_context = function()
-  local contexts = M.get()
+  local contexts = M._get()
   vim.ui.select(contexts, {
     prompt = "Select target contexts:",
   }, function(choice)
     M.target_context = choice
+    print(M.target_context)
   end)
 end
 
