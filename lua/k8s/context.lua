@@ -26,21 +26,21 @@ M._get_current = function()
     local parser, tree = M._load_config()
 
     local ts_query = [[
-  (document
-    (block_node
-      (block_mapping
-        (block_mapping_pair
-          key:   ((flow_node) @constant
-                  (#eq? @constant "current-context"))
-          value: (flow_node
-                   (plain_scalar)
-                   @capture
-                 )
+    (document
+      (block_node
+        (block_mapping
+          (block_mapping_pair
+            key:   ((flow_node) @constant
+                    (#eq? @constant "current-context"))
+            value: (flow_node
+                     (plain_scalar)
+                     @capture
+                   )
+          )
         )
       )
     )
-  )
-  ]]
+    ]]
 
     local query = vim.treesitter.query.parse("yaml", ts_query)
 
@@ -58,34 +58,34 @@ M._get_list = function()
     local parser, tree = M._load_config()
 
     local ts_query = [[
-  (document
-    (block_node
-      (block_mapping
-        (block_mapping_pair
-          key:   ((flow_node) @constant
-                  (#eq? @constant "contexts"))
-          value: (block_node
-                   (block_sequence
-                     (block_sequence_item
-                       (block_node
-                         (block_mapping
-                           (block_mapping_pair
-                             key:   ((flow_node) @field
-                                     (#eq? @field "name"))
-                             value: (flow_node
-                                      (plain_scalar) @capture
-                                    )
+    (document
+      (block_node
+        (block_mapping
+          (block_mapping_pair
+            key:   ((flow_node) @constant
+                    (#eq? @constant "contexts"))
+            value: (block_node
+                     (block_sequence
+                       (block_sequence_item
+                         (block_node
+                           (block_mapping
+                             (block_mapping_pair
+                               key:   ((flow_node) @field
+                                       (#eq? @field "name"))
+                               value: (flow_node
+                                        (plain_scalar) @capture
+                                      )
+                             )
                            )
                          )
                        )
                      )
                    )
-                 )
+          )
         )
       )
     )
-  )
-  ]]
+    ]]
 
     local query = vim.treesitter.query.parse("yaml", ts_query)
 
