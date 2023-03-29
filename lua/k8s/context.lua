@@ -20,7 +20,10 @@ M._load_config = function()
 	return parser, tree
 end
 
--- load contexts from config.kubeconfig_location
+-- get current context
+M._get_current = function() end
+
+-- get list of contexts from config.kubeconfig_location
 M._get_list = function()
 	local parser, tree = M._load_config()
 
