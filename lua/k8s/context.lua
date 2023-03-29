@@ -1,7 +1,5 @@
-local ts_utils = require("nvim-treesitter.ts_utils")
-
 local utils = require("k8s.utils")
-local constants = require("k8s.constants")
+local config = require("k8s").config
 
 local M = {}
 
@@ -36,7 +34,7 @@ local context_names_query = [[
 ]]
 
 M.get = function()
-	local content = utils.readfile(constants.kubeconfig)
+	local content = utils.readfile(config.kubeconfig_location)
 
 	vim.treesitter.language.add("yaml")
 	local parser = vim.treesitter.get_string_parser(content, "yaml")
