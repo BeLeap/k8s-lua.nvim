@@ -23,7 +23,7 @@ end
 -- get current context
 M._get_current = function() end
 
--- get list of contexts from config.kubeconfig_location
+-- get list of contexts
 M._get_list = function()
 	local parser, tree = M._load_config()
 
