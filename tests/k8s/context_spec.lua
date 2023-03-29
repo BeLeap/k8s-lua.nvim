@@ -45,6 +45,16 @@ describe("contexts", function()
 		}
 	end)
 
+	it("_get_current", function()
+		it("should return current context", function()
+			local mock_utils = mock(utils, true)
+			mock_utils.readfile.returns(mock_kubeconfig)
+
+			local contexts = context._get_current()
+			assert.are.same("minikube-1", contexts)
+		end)
+	end)
+
 	it("_get_list", function()
 		it("should return list of contexts", function()
 			local mock_utils = mock(utils, true)
