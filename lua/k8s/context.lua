@@ -38,6 +38,7 @@ local context_names_query = [[
 M.get = function()
 	local content = utils.readfile(constants.kubeconfig)
 
+	vim.treesitter.language.add("yaml")
 	local parser = vim.treesitter.get_string_parser(content, "yaml")
 	local tree = parser:parse()
 
