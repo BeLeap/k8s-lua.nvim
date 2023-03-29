@@ -2,8 +2,8 @@ local utils = require("k8s.utils")
 
 -- @module context
 -- @alias M
--- @field config config
--- @field target_context target context
+-- @field config table config
+-- @field target_context string|nil target context
 local M = {
 	config = {},
 }
@@ -113,6 +113,7 @@ end
 -- initial setup
 M.setup = function(config)
 	M.config.context = config.context
+	M.target_context = M._get_current()
 end
 
 return M
