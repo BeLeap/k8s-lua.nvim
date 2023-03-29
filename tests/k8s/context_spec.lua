@@ -44,7 +44,11 @@ describe("contexts", function()
 
 			mock_utils.readfile.returns(mock_kubeconfig)
 
-			local contexts = context.get()
+			context.config = {}
+			context.config.context = {
+				location = "~/.kube/config",
+			}
+			local contexts = context._get()
 			assert.are.same({ "minikube-1", "minikube-2" }, contexts)
 		end)
 	end)
