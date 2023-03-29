@@ -8,10 +8,6 @@ local M = {
 	config = {},
 }
 
-M.setup = function(config)
-	M.config.context = config.context
-end
-
 -- load kubeconfig as LangaugeTree and TSTree
 -- @return LanguageTree, TSTree treesitter objects of kubeconfig
 M._load_config = function()
@@ -79,6 +75,11 @@ M.select_context = function()
 		M.target_context = choice
 		print(M.target_context)
 	end)
+end
+
+-- initial setup
+M.setup = function(config)
+	M.config.context = config.context
 end
 
 return M
