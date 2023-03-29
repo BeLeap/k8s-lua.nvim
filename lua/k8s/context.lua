@@ -21,13 +21,43 @@ M._load_config = function()
 end
 
 -- get current context
-M._get_current = function() end
+-- @return string|nil
+M._get_current = function()
+	local parser, tree = M._load_config()
+
+	local ts_query = [[
+  (document
+    (block_node
+      (block_mapping
+        (block_mapping_pair
+          key:   ((flow_node) @constant
+                  (#eq? @constant "current-context"))
+          value: (flow_node
+                   (plain_scalar)
+                   @capture
+                 )
+        )
+      )
+    )
+  )
+  ]]
+
+	local query = vim.treesitter.query.parse("yaml", ts_query)
+
+	for _, node, _ in query:iter_captures(tree[1]:root(), parser:source(), 0, 1000) do
+		if node:type() == "plain_scalar" then
+			return vim.treesitter.get_node_text(node, parser:source())
+		end
+	end
+
+	return nil
+end
 
 -- get list of contexts
 M._get_list = function()
 	local parser, tree = M._load_config()
 
-	local context_names_query = [[
+	local ts_query = [[
   (document
     (block_node
       (block_mapping
@@ -57,7 +87,7 @@ M._get_list = function()
   )
   ]]
 
-	local query = vim.treesitter.query.parse("yaml", context_names_query)
+	local query = vim.treesitter.query.parse("yaml", ts_query)
 
 	local contexts = {}
 	for _, node, _ in query:iter_captures(tree[1]:root(), parser:source(), 0, 1000) do
