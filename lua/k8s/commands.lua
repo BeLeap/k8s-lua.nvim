@@ -1,4 +1,4 @@
-local context = require("k8s.context")
+local context = require("k8s.resources.context")
 
 local M = {
     commands = {

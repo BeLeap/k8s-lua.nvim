@@ -1,29 +1,11 @@
-local utils = require("k8s.utils")
+local kube_config = require("k8s.kube_config")
 
--- @module context
--- @alias M
--- @field config table config
--- @field target_context string|nil target context
-local M = {
-    config = {},
-}
-
--- load kubeconfig as LangaugeTree and TSTree
--- @return LanguageTree, TSTree treesitter objects of kubeconfig
-M._load_config = function()
-    local content = utils.readfile(vim.fs.normalize(M.config.context.location))
-
-    vim.treesitter.language.add("yaml")
-    local parser = vim.treesitter.get_string_parser(content, "yaml")
-    local tree = parser:parse()
-
-    return parser, tree
-end
+local M = {}
 
 -- get current context
 -- @return string|nil
 M._get_current = function()
-    local parser, tree = M._load_config()
+    local parser, tree = kube_config._load_config()
 
     local ts_query = [[
     (document
@@ -55,7 +37,7 @@ end
 
 -- get list of contexts
 M._get_list = function()
-    local parser, tree = M._load_config()
+    local parser, tree = kube_config._load_config()
 
     local ts_query = [[
     (document
@@ -119,9 +101,7 @@ M.select_context = function()
     end)
 end
 
--- initial setup
-M.setup = function(config)
-    M.config.context = config.context
+M.setup = function(_config)
     M.target_context = M._get_current()
 end
 

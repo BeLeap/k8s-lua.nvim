@@ -1,4 +1,4 @@
-local context = require("k8s.context")
+local context = require("k8s.resources.context")
 local utils = require("k8s.utils")
 local mock = require("luassert.mock")
 
