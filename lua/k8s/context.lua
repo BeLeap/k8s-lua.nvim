@@ -104,9 +104,18 @@ M.select_context = function()
     local contexts = M._get_list()
     vim.ui.select(contexts, {
         prompt = "Select target contexts:",
+        format_item = function(context)
+            if context == M.target_context then
+                return "* " .. context
+            else
+                return "  " .. context
+            end
+        end,
     }, function(choice)
-        M.target_context = choice
-        print(M.target_context)
+        if choice ~= nil then
+            M.target_context = choice
+            print(M.target_context)
+        end
     end)
 end
 
