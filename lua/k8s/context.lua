@@ -5,27 +5,27 @@ local utils = require("k8s.utils")
 -- @field config table config
 -- @field target_context string|nil target context
 local M = {
-	config = {},
+    config = {},
 }
 
 -- load kubeconfig as LangaugeTree and TSTree
 -- @return LanguageTree, TSTree treesitter objects of kubeconfig
 M._load_config = function()
-	local content = utils.readfile(vim.fs.normalize(M.config.context.location))
+    local content = utils.readfile(vim.fs.normalize(M.config.context.location))
 
-	vim.treesitter.language.add("yaml")
-	local parser = vim.treesitter.get_string_parser(content, "yaml")
-	local tree = parser:parse()
+    vim.treesitter.language.add("yaml")
+    local parser = vim.treesitter.get_string_parser(content, "yaml")
+    local tree = parser:parse()
 
-	return parser, tree
+    return parser, tree
 end
 
 -- get current context
 -- @return string|nil
 M._get_current = function()
-	local parser, tree = M._load_config()
+    local parser, tree = M._load_config()
 
-	local ts_query = [[
+    local ts_query = [[
   (document
     (block_node
       (block_mapping
@@ -42,22 +42,22 @@ M._get_current = function()
   )
   ]]
 
-	local query = vim.treesitter.query.parse("yaml", ts_query)
+    local query = vim.treesitter.query.parse("yaml", ts_query)
 
-	for _, node, _ in query:iter_captures(tree[1]:root(), parser:source(), 0, 1000) do
-		if node:type() == "plain_scalar" then
-			return vim.treesitter.get_node_text(node, parser:source())
-		end
-	end
+    for _, node, _ in query:iter_captures(tree[1]:root(), parser:source(), 0, 1000) do
+        if node:type() == "plain_scalar" then
+            return vim.treesitter.get_node_text(node, parser:source())
+        end
+    end
 
-	return nil
+    return nil
 end
 
 -- get list of contexts
 M._get_list = function()
-	local parser, tree = M._load_config()
+    local parser, tree = M._load_config()
 
-	local ts_query = [[
+    local ts_query = [[
   (document
     (block_node
       (block_mapping
@@ -87,33 +87,33 @@ M._get_list = function()
   )
   ]]
 
-	local query = vim.treesitter.query.parse("yaml", ts_query)
+    local query = vim.treesitter.query.parse("yaml", ts_query)
 
-	local contexts = {}
-	for _, node, _ in query:iter_captures(tree[1]:root(), parser:source(), 0, 1000) do
-		if node:type() == "plain_scalar" then
-			vim.list_extend(contexts, { vim.treesitter.get_node_text(node, parser:source()) })
-		end
-	end
+    local contexts = {}
+    for _, node, _ in query:iter_captures(tree[1]:root(), parser:source(), 0, 1000) do
+        if node:type() == "plain_scalar" then
+            vim.list_extend(contexts, { vim.treesitter.get_node_text(node, parser:source()) })
+        end
+    end
 
-	return contexts
+    return contexts
 end
 
 -- select context with vim.ui.select
 M.select_context = function()
-	local contexts = M._get_list()
-	vim.ui.select(contexts, {
-		prompt = "Select target contexts:",
-	}, function(choice)
-		M.target_context = choice
-		print(M.target_context)
-	end)
+    local contexts = M._get_list()
+    vim.ui.select(contexts, {
+        prompt = "Select target contexts:",
+    }, function(choice)
+        M.target_context = choice
+        print(M.target_context)
+    end)
 end
 
 -- initial setup
 M.setup = function(config)
-	M.config.context = config.context
-	M.target_context = M._get_current()
+    M.config.context = config.context
+    M.target_context = M._get_current()
 end
 
 return M
