@@ -12,8 +12,22 @@ M.setup = function(config)
 	M.config.context = config.context
 end
 
+-- load kubeconfig as LangaugeTree and TSTree
+-- @return LanguageTree, TSTree treesitter objects of kubeconfig
+M._load_config = function()
+	local content = utils.readfile(vim.fs.normalize(M.config.context.location))
+
+	vim.treesitter.language.add("yaml")
+	local parser = vim.treesitter.get_string_parser(content, "yaml")
+	local tree = parser:parse()
+
+	return parser, tree
+end
+
 -- load contexts from config.kubeconfig_location
 M._get_list = function()
+	local parser, tree = M._load_config()
+
 	local context_names_query = [[
   (document
     (block_node
@@ -44,13 +58,8 @@ M._get_list = function()
   )
   ]]
 
-	local content = utils.readfile(vim.fs.normalize(M.config.context.location))
-
-	vim.treesitter.language.add("yaml")
-	local parser = vim.treesitter.get_string_parser(content, "yaml")
-	local tree = parser:parse()
-
 	local query = vim.treesitter.query.parse("yaml", context_names_query)
+
 	local contexts = {}
 	for _, node, _ in query:iter_captures(tree[1]:root(), parser:source(), 0, 1000) do
 		if node:type() == "plain_scalar" then
