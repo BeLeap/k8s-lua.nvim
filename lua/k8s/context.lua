@@ -13,7 +13,7 @@ M.setup = function(config)
 end
 
 -- load contexts from config.kubeconfig_location
-M._get = function()
+M._get_list = function()
 	local context_names_query = [[
   (document
     (block_node
@@ -63,7 +63,7 @@ end
 
 -- select context with vim.ui.select
 M.select_context = function()
-	local contexts = M._get()
+	local contexts = M._get_list()
 	vim.ui.select(contexts, {
 		prompt = "Select target contexts:",
 	}, function(choice)

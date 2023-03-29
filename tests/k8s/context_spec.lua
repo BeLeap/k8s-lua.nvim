@@ -48,7 +48,7 @@ describe("contexts", function()
 			context.config.context = {
 				location = "~/.kube/config",
 			}
-			local contexts = context._get()
+			local contexts = context._get_list()
 			assert.are.same({ "minikube-1", "minikube-2" }, contexts)
 		end)
 	end)
