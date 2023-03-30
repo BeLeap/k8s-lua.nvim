@@ -1,4 +1,5 @@
-local context = require("k8s.resources.context")
+local resources_context = require("k8s.resources.context")
+local resources_namespace = require("k8s.resources.namespace")
 
 local M = {
     commands = {
@@ -8,7 +9,14 @@ local M = {
                 desc = "select target context",
             },
             command = function()
-                context.select_context()
+                resources_context.select_context()
+            end,
+        },
+        {
+            name = "K8sListNamespace",
+            opts = {},
+            command = function()
+                resources_namespace.list()
             end,
         },
     },
