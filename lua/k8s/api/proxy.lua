@@ -25,6 +25,7 @@ end
 
 M.shutdown = function()
     if M.proxy._handle ~= nil then
+        M.proxy._handle:shutdown()
         uv.kill(M.proxy._handle.pid, 3)
         M.proxy = {}
     end
