@@ -1,9 +1,11 @@
 local Job = require("plenary.job")
 local uv = require("luv")
 
+-- @field started boolean
 -- @field _handle Job|nil
 -- @field port string|nil
 local M = {
+    started = false,
     _handle = nil,
     port = nil,
 }
@@ -21,12 +23,15 @@ M.start = function()
         end,
     })
     M._handle:start()
+    M.started = true
 end
 
 M.shutdown = function()
-    if M._handle ~= nil then
+    if M.started == true then
         M._handle:shutdown()
         uv.kill(M._handle.pid, 3)
+
+        M.started = false
         M._handle = nil
         M.port = nil
     end
