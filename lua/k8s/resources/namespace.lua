@@ -12,6 +12,27 @@ local proxy = require("k8s.api.proxy")
 
 local M = {}
 
+M.get = function(namespace)
+    vim.validate({
+        namespace = { namespace, "string" },
+    })
+
+    if proxy.started == false then
+        proxy.start()
+    end
+
+    vim.wait(1000, function()
+        return proxy.port ~= nil
+    end, 100)
+
+    local url = "localhost:" .. tostring(proxy.port) .. "/api/v1/namespaces/" .. tostring(namespace)
+    local res = curl.get(url)
+
+    if res ~= nil then
+        return vim.json.decode(res.body)
+    end
+end
+
 M.select = function()
     if proxy.started == false then
         proxy.start()
@@ -25,7 +46,7 @@ M.select = function()
     local res = curl.get(url)
 
     if res ~= nil then
-        local data = vim.fn.json_decode(res.body)
+        local data = vim.json.decode(res.body)
 
         local items_iter = iterators.iter(data.items)
         local names_iter = items_iter:map(function(item)
@@ -65,13 +86,27 @@ M.select = function()
                     dyn_title = function(_, entry)
                         return "Describe - " .. entry.value
                     end,
-                    define_preview = function(self, entry, status)
-                        vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, { "lorem ipsum" })
+                    define_preview = function(self, entry, _status)
+                        local preview_data = M.get(entry.value)
+                        vim.api.nvim_buf_set_option(self.state.bufnr, "ft", "lua")
+                        vim.api.nvim_buf_set_lines(
+                            self.state.bufnr,
+                            0,
+                            -1,
+                            false,
+                            vim.fn.split(tostring(vim.inspect(preview_data)), "\n")
+                        )
                     end,
                 }),
             })
             :find()
     end
+end
+
+M.test = function()
+    local result = tostring(vim.inspect(M.get("airflow")))
+    local bar = vim.fn.split(result, "\n")
+    print(vim.inspect(bar))
 end
 
 return M
