@@ -1,15 +1,17 @@
 local Job = require("plenary.job")
 local uv = require("luv")
 
--- @field proxy table
---        - _handle: Job
---        - port: number
+-- @field started boolean
+-- @field _handle Job|nil
+-- @field port string|nil
 local M = {
-    proxy = {},
+    started = false,
+    _handle = nil,
+    port = nil,
 }
 
 M.start = function()
-    M.proxy._handle = Job:new({
+    M._handle = Job:new({
         command = "kubectl",
         args = {
             "proxy",
@@ -17,17 +19,21 @@ M.start = function()
         },
         on_stdout = function(_error, data)
             local splitted_data = vim.split(data, ":")
-            M.proxy.port = splitted_data[2]
+            M.port = splitted_data[2]
         end,
     })
-    M.proxy._handle:start()
+    M._handle:start()
+    M.started = true
 end
 
 M.shutdown = function()
-    if M.proxy._handle ~= nil then
-        M.proxy._handle:shutdown()
-        uv.kill(M.proxy._handle.pid, 3)
-        M.proxy = {}
+    if M.started == true then
+        M._handle:shutdown()
+        uv.kill(M._handle.pid, 3)
+
+        M.started = false
+        M._handle = nil
+        M.port = nil
     end
 end
 

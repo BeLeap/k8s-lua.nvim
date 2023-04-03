@@ -1,3 +1,9 @@
+local pickers = require("telescope.pickers")
+local finders = require("telescope.finders")
+local conf = require("telescope.config").values
+local actions = require("telescope.actions")
+local action_state = require("telescope.actions.state")
+
 local kube_config = require("k8s.kube_config")
 
 local M = {}
@@ -81,24 +87,39 @@ M._get_list = function()
     return contexts
 end
 
--- select context with vim.ui.select
+-- select context with telescope picker
 M.select_context = function()
     local contexts = M._get_list()
-    vim.ui.select(contexts, {
-        prompt = "Select target contexts:",
-        format_item = function(context)
-            if context == M.target_context then
-                return "* " .. context
-            else
-                return "  " .. context
-            end
-        end,
-    }, function(choice)
-        if choice ~= nil then
-            M.target_context = choice
-            print(M.target_context)
-        end
-    end)
+
+    pickers
+        .new({}, {
+            prompt_title = "Contexts",
+            finder = finders.new_table({
+                results = contexts,
+                entry_maker = function(context)
+                    local display = "  " .. context
+                    if context == M.target_context then
+                        display = "* " .. context
+                    end
+
+                    return {
+                        value = context,
+                        display = display,
+                        ordinal = context,
+                    }
+                end,
+            }),
+            sorter = conf.generic_sorter(),
+            attach_mappings = function(prompt_bufnr, _map)
+                actions.select_default:replace(function()
+                    actions.close(prompt_bufnr)
+                    local selection = action_state.get_selected_entry()
+                    M.target_context = selection.value
+                end)
+                return true
+            end,
+        })
+        :find()
 end
 
 M.setup = function(_config)
