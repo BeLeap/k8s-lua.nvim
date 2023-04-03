@@ -17,6 +17,9 @@ vim.opt.runtimepath:append(".")
 
 ensure_install("nvim-lua/plenary.nvim")
 ensure_install("nvim-treesitter/nvim-treesitter")
+ensure_install("nvim-telescope/telescope.nvim")
+
+require("telescope").setup()
 
 vim.cmd("runtime plugin/plenary.vim")
 require("plenary.busted")
