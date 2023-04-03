@@ -1,6 +1,12 @@
 local curl = require("plenary.curl")
 local iterators = require("plenary.iterators")
 
+local pickers = require("telescope.pickers")
+local finders = require("telescope.finders")
+local conf = require("telescope.config").values
+local actions = require("telescope.actions")
+local action_state = require("telescope.actions.state")
+
 local proxy = require("k8s.api.proxy")
 
 local M = {}
@@ -24,8 +30,25 @@ M.list = function()
         local names_iter = items_iter:map(function(item)
             return item.metadata.name
         end)
+        local names = names_iter:tolist()
 
-        vim.ui.select(names_iter:tolist(), {}, function(_choice) end)
+        pickers
+            .new({}, {
+                prompt_title = "Namespaces",
+                finder = finders.new_table({
+                    results = names,
+                }),
+                sorter = conf.generic_sorter(),
+                attach_mappings = function(prompt_bufnr, _map)
+                    actions.select_default:replace(function()
+                        actions.close(prompt_bufnr)
+                        local selection = action_state.get_selected_entry()
+                        print(selection.value)
+                    end)
+                    return true
+                end,
+            })
+            :find()
     end
 end
 
