@@ -13,10 +13,10 @@ local M = {
             end,
         },
         {
-            name = "K8sListNamespace",
+            name = "K8sNamespaceSelect",
             opts = {},
             command = function()
-                resources_namespace.list()
+                resources_namespace.select()
             end,
         },
     },
