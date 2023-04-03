@@ -87,11 +87,10 @@ M._get_list = function()
     return contexts
 end
 
--- select context with vim.ui.select
+-- select context with telescope picker
 M.select_context = function()
     local contexts = M._get_list()
 
-    -- our picker function: colors
     pickers
         .new({}, {
             prompt_title = "Contexts",
