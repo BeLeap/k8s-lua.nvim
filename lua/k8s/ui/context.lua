@@ -9,7 +9,7 @@ local resources_context = require("k8s.resources.context")
 local M = {}
 
 -- select context with telescope picker
-M.select_context = function()
+M.select = function()
     local contexts = resources_context.list()
 
     pickers

@@ -9,7 +9,7 @@ local M = {
                 desc = "select target context",
             },
             command = function()
-                ui_context.select_context()
+                ui_context.select()
             end,
         },
         {
