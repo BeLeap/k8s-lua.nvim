@@ -1,16 +1,11 @@
-local pickers = require("telescope.pickers")
-local finders = require("telescope.finders")
-local conf = require("telescope.config").values
-local actions = require("telescope.actions")
-local action_state = require("telescope.actions.state")
-
 local kube_config = require("k8s.kube_config")
 
+-- @field target_context string
 local M = {}
 
 -- get current context
 -- @return string|nil
-M._get_current = function()
+M.get_current = function()
     local parser, tree = kube_config._load_config()
 
     local ts_query = [[
@@ -42,7 +37,7 @@ M._get_current = function()
 end
 
 -- get list of contexts
-M._get_list = function()
+M.list = function()
     local parser, tree = kube_config._load_config()
 
     local ts_query = [[
@@ -87,43 +82,8 @@ M._get_list = function()
     return contexts
 end
 
--- select context with telescope picker
-M.select_context = function()
-    local contexts = M._get_list()
-
-    pickers
-        .new({}, {
-            prompt_title = "Contexts",
-            finder = finders.new_table({
-                results = contexts,
-                entry_maker = function(context)
-                    local display = "  " .. context
-                    if context == M.target_context then
-                        display = "* " .. context
-                    end
-
-                    return {
-                        value = context,
-                        display = display,
-                        ordinal = context,
-                    }
-                end,
-            }),
-            sorter = conf.generic_sorter(),
-            attach_mappings = function(prompt_bufnr, _map)
-                actions.select_default:replace(function()
-                    actions.close(prompt_bufnr)
-                    local selection = action_state.get_selected_entry()
-                    M.target_context = selection.value
-                end)
-                return true
-            end,
-        })
-        :find()
-end
-
 M.setup = function(_config)
-    M.target_context = M._get_current()
+    M.target_context = M.get_current()
 end
 
 return M

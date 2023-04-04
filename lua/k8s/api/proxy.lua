@@ -1,19 +1,25 @@
 local Job = require("plenary.job")
 local uv = require("luv")
+local resources_context = require("k8s.resources.context")
 
 -- @field started boolean
 -- @field _handle Job|nil
 -- @field port string|nil
+-- @field current_context string|nil
 local M = {
     started = false,
     _handle = nil,
     port = nil,
+    current_context = nil,
 }
 
 M.start = function()
+    M.current_context = resources_context.target_context
+
     M._handle = Job:new({
         command = "kubectl",
         args = {
+            "--context=" .. M.current_context,
             "proxy",
             "--port=0",
         },
@@ -24,6 +30,15 @@ M.start = function()
     })
     M._handle:start()
     M.started = true
+end
+
+M.update = function()
+    if M.started == true and M.current_context == resources_context.target_context then
+        return
+    end
+
+    M.shutdown()
+    M.start()
 end
 
 M.shutdown = function()

@@ -45,12 +45,12 @@ describe("contexts", function()
         }
     end)
 
-    it("_get_current", function()
+    it("get_current", function()
         it("should return current context", function()
             local mock_utils = mock(utils, true)
             mock_utils.readfile.returns(mock_kubeconfig)
 
-            local contexts = context._get_current()
+            local contexts = context.get_current()
             assert.are.same("minikube-1", contexts)
         end)
 
@@ -92,17 +92,17 @@ describe("contexts", function()
             local mock_utils = mock(utils, true)
             mock_utils.readfile.returns(mock_kubeconfig_without_current_context)
 
-            local contexts = context._get_current()
+            local contexts = context.get_current()
             assert.are.same(nil, contexts)
         end)
     end)
 
-    it("_get_list", function()
+    it("list", function()
         it("should return list of contexts", function()
             local mock_utils = mock(utils, true)
             mock_utils.readfile.returns(mock_kubeconfig)
 
-            local contexts = context._get_list()
+            local contexts = context.list()
             assert.are.same({ "minikube-1", "minikube-2" }, contexts)
         end)
     end)
