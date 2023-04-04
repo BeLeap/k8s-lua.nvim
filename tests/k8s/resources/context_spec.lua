@@ -97,7 +97,7 @@ describe("contexts", function()
         end)
     end)
 
-    it("get_list", function()
+    it("list", function()
         it("should return list of contexts", function()
             local mock_utils = mock(utils, true)
             mock_utils.readfile.returns(mock_kubeconfig)
