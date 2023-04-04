@@ -10,7 +10,7 @@ local M = {}
 
 -- select context with telescope picker
 M.select_context = function()
-    local contexts = resources_context.get_list()
+    local contexts = resources_context.list()
 
     pickers
         .new({}, {
