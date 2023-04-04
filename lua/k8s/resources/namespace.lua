@@ -19,7 +19,8 @@ M.get = function(namespace)
     return client.get("/api/v1/namespaces/" .. tostring(namespace))
 end
 
-M.select = function()
+-- @return array|nil
+M.list = function()
     local data = client.get("/api/v1/namespaces")
 
     if data ~= nil then
@@ -27,8 +28,14 @@ M.select = function()
         local names_iter = items_iter:map(function(item)
             return item.metadata.name
         end)
-        local names = names_iter:tolist()
+        return names_iter:tolist()
+    end
+end
 
+M.select = function()
+    local names = M.list()
+
+    if names ~= nil then
         pickers
             .new({}, {
                 prompt_title = "Namespaces",
@@ -76,12 +83,6 @@ M.select = function()
             })
             :find()
     end
-end
-
-M.test = function()
-    local result = tostring(vim.inspect(M.get("airflow")))
-    local bar = vim.fn.split(result, "\n")
-    print(vim.inspect(bar))
 end
 
 return M
