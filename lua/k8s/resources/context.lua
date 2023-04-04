@@ -36,7 +36,7 @@ M.get_current = function()
 end
 
 -- get list of contexts
-M.get_list = function()
+M.list = function()
     local parser, tree = kube_config._load_config()
 
     local ts_query = [[

@@ -4,11 +4,13 @@ local conf = require("telescope.config").values
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 
+local resources_context = require("k8s.resources.context")
+
 local M = {}
 
 -- select context with telescope picker
 M.select_context = function()
-    local contexts = M.get_list()
+    local contexts = resources_context.get_list()
 
     pickers
         .new({}, {
@@ -17,7 +19,7 @@ M.select_context = function()
                 results = contexts,
                 entry_maker = function(context)
                     local display = "  " .. context
-                    if context == M.target_context then
+                    if context == resources_context.target_context then
                         display = "* " .. context
                     end
 
