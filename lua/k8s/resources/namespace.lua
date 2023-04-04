@@ -1,4 +1,3 @@
-local curl = require("plenary.curl")
 local iterators = require("plenary.iterators")
 
 local pickers = require("telescope.pickers")
@@ -8,7 +7,7 @@ local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 local previewers = require("telescope.previewers")
 
-local proxy = require("k8s.api.proxy")
+local client = require("k8s.api.client")
 
 local M = {}
 
@@ -17,37 +16,13 @@ M.get = function(namespace)
         namespace = { namespace, "string" },
     })
 
-    if proxy.started == false then
-        proxy.start()
-    end
-
-    vim.wait(1000, function()
-        return proxy.port ~= nil
-    end, 100)
-
-    local url = "localhost:" .. tostring(proxy.port) .. "/api/v1/namespaces/" .. tostring(namespace)
-    local res = curl.get(url)
-
-    if res ~= nil then
-        return vim.json.decode(res.body)
-    end
+    return client.get("/api/v1/namespaces/" .. tostring(namespace))
 end
 
 M.select = function()
-    if proxy.started == false then
-        proxy.start()
-    end
+    local data = client.get("/api/v1/namespaces")
 
-    vim.wait(1000, function()
-        return proxy.port ~= nil
-    end, 100)
-
-    local url = "localhost:" .. tostring(proxy.port) .. "/api/v1/namespaces"
-    local res = curl.get(url)
-
-    if res ~= nil then
-        local data = vim.json.decode(res.body)
-
+    if data ~= nil then
         local items_iter = iterators.iter(data.items)
         local names_iter = items_iter:map(function(item)
             return item.metadata.name
