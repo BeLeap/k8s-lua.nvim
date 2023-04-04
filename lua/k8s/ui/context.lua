@@ -35,7 +35,7 @@ M.select = function()
                 actions.select_default:replace(function()
                     actions.close(prompt_bufnr)
                     local selection = action_state.get_selected_entry()
-                    contexts.target_context = selection.value
+                    resources_context.target_context = selection.value
                 end)
                 return true
             end,
