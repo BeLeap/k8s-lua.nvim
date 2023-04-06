@@ -4,48 +4,41 @@ local conf = require("telescope.config").values
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 local previewers = require("telescope.previewers")
-local resources_namespace = require("k8s.resources.namespace")
 
-local iterators = require("plenary.iterators")
+local resources_pod = require("k8s.resources.pod")
 
 local M = {}
 
 M.select = function()
-    local iter = resources_namespace.list_iter()
+    local names = resources_pod.list_iter()
 
-    if iter ~= nil then
-        local names_iter = iter:map(function(item)
-            return item.metadata.name
-        end)
-        local names = names_iter:tolist()
-
-        local selected_idx
-        for i, v in ipairs(names) do
-            if v == resources_namespace.target_namespace then
-                selected_idx = i
-            end
-        end
-
+    if names ~= nil then
         pickers
             .new({}, {
-                prompt_title = "Namespaces",
+                prompt_title = "Pods",
                 finder = finders.new_table({
-                    results = names_iter:tolist(),
-                    entry_maker = function(name)
+                    results = names
+                        :map(function(elem)
+                            return {
+                                namespace = elem.metadata.namespace,
+                                name = elem.metadata.name,
+                            }
+                        end)
+                        :tolist(),
+                    entry_maker = function(entry)
                         return {
-                            value = name,
-                            display = name,
-                            ordinal = name,
+                            value = entry,
+                            display = entry.name,
+                            ordinal = entry.name,
                         }
                     end,
                 }),
-                default_selection_index = selected_idx,
                 sorter = conf.generic_sorter(),
                 attach_mappings = function(prompt_bufnr, _map)
                     actions.select_default:replace(function()
                         actions.close(prompt_bufnr)
                         local selection = action_state.get_selected_entry()
-                        resources_namespace.target_namespace = selection.value
+                        print(vim.inspect(selection))
                     end)
                     return true
                 end,
@@ -55,7 +48,7 @@ M.select = function()
                         return "Describe - " .. entry.display
                     end,
                     define_preview = function(self, entry, _status)
-                        local preview_data = resources_namespace.get(entry.value)
+                        local preview_data = resources_pod.get(entry.value.namespace, entry.value.name)
                         vim.api.nvim_buf_set_option(self.state.bufnr, "ft", "lua")
                         vim.api.nvim_buf_set_lines(
                             self.state.bufnr,
