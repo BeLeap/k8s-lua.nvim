@@ -3,7 +3,6 @@ local utils = require("k8s.utils")
 -- @module context
 -- @alias M
 -- @field config table config
--- @field target_context string|nil target context
 local M = {
     config = {
         kube_config = {},

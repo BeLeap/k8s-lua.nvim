@@ -2,7 +2,10 @@ local iterators = require("plenary.iterators")
 
 local client = require("k8s.api.client")
 
-local M = {}
+-- @field target string|nil
+local M = {
+    target = nil,
+}
 
 M.get = function(namespace)
     vim.validate({

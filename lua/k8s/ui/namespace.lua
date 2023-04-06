@@ -6,8 +6,6 @@ local action_state = require("telescope.actions.state")
 local previewers = require("telescope.previewers")
 local resources_namespace = require("k8s.resources.namespace")
 
-local iterators = require("plenary.iterators")
-
 local M = {}
 
 M.select = function()
@@ -21,7 +19,7 @@ M.select = function()
 
         local selected_idx
         for i, v in ipairs(names) do
-            if v == resources_namespace.target_namespace then
+            if v == resources_namespace.target then
                 selected_idx = i
             end
         end
@@ -45,7 +43,7 @@ M.select = function()
                     actions.select_default:replace(function()
                         actions.close(prompt_bufnr)
                         local selection = action_state.get_selected_entry()
-                        resources_namespace.target_namespace = selection.value
+                        resources_namespace.target = selection.value
                     end)
                     return true
                 end,

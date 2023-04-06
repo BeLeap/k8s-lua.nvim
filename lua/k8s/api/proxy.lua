@@ -14,7 +14,7 @@ local M = {
 }
 
 M.start = function()
-    M.current_context = resources_context.target_context
+    M.current_context = resources_context.target
 
     M._handle = Job:new({
         command = "kubectl",
@@ -33,7 +33,7 @@ M.start = function()
 end
 
 M.update = function()
-    if M.started == true and M.current_context == resources_context.target_context then
+    if M.started == true and M.current_context == resources_context.target then
         return
     end
 

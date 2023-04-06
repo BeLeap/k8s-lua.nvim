@@ -6,7 +6,7 @@ local resources_namespace = require("k8s.resources.namespace")
 
 describe("pod", function()
     after_each(function()
-        resources_namespace.target_namespace = nil
+        resources_namespace.target = nil
     end)
 
     it("get", function()
@@ -40,8 +40,8 @@ describe("pod", function()
             assert.stub(mock_client.get).was_called_with("/api/v1/pods")
         end)
 
-        it("should request pods info with namespace if target_namespace exists", function()
-            resources_namespace.target_namespace = "foo"
+        it("should request pods info with namespace if namespace target exists", function()
+            resources_namespace.target = "foo"
 
             local mock_client = mock(client, true)
             mock_client.get.returns({
