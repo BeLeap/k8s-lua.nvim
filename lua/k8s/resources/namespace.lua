@@ -12,16 +12,12 @@ M.get = function(namespace)
     return client.get("/api/v1/namespaces/" .. tostring(namespace))
 end
 
--- @return array|nil
-M.list = function()
+-- @return iterator|nil
+M.list_iter = function()
     local data = client.get("/api/v1/namespaces")
 
     if data ~= nil then
-        local items_iter = iterators.iter(data.items)
-        local names_iter = items_iter:map(function(item)
-            return item.metadata.name
-        end)
-        return names_iter:tolist()
+        return iterators.iter(data.items)
     end
 end
 

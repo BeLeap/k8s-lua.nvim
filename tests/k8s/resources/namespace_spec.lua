@@ -15,7 +15,7 @@ describe("namespace", function()
         end)
     end)
 
-    it("list", function()
+    it("list_iter", function()
         it("should return metadata names in items from client get result", function()
             local mock_client = mock(client, true)
             mock_client.get.returns({
@@ -28,9 +28,9 @@ describe("namespace", function()
                 },
             })
 
-            local result = namespace.list()
+            local result = namespace.list_iter()
 
-            assert.are.same({ "lorem ipsum" }, result)
+            assert.are.same({ { metadata = { name = "lorem ipsum" } } }, result:tolist())
             assert.stub(mock_client.get).was_called_with("/api/v1/namespaces")
         end)
     end)
