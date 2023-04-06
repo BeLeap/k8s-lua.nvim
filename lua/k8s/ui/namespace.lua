@@ -4,37 +4,42 @@ local conf = require("telescope.config").values
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 local previewers = require("telescope.previewers")
-
 local resources_namespace = require("k8s.resources.namespace")
+
+local iterators = require("plenary.iterators")
 
 local M = {}
 
 M.select = function()
-    local names = resources_namespace.list_iter()
+    local iter = resources_namespace.list_iter()
 
-    if names ~= nil then
+    if iter ~= nil then
+        local names_iter = iter:map(function(item)
+            return item.metadata.name
+        end)
+        local names = names_iter:tolist()
+
+        local selected_idx
+        for i, v in ipairs(names) do
+            if v == resources_namespace.target_namespace then
+                selected_idx = i
+            end
+        end
+
         pickers
             .new({}, {
                 prompt_title = "Namespaces",
                 finder = finders.new_table({
-                    results = names
-                        :map(function(item)
-                            return item.metadata.name
-                        end)
-                        :tolist(),
+                    results = names_iter:tolist(),
                     entry_maker = function(name)
-                        local display = "  " .. name
-                        if name == resources_namespace.target_namespace then
-                            display = "* " .. name
-                        end
-
                         return {
                             value = name,
-                            display = display,
+                            display = name,
                             ordinal = name,
                         }
                     end,
                 }),
+                default_selection_index = selected_idx,
                 sorter = conf.generic_sorter(),
                 attach_mappings = function(prompt_bufnr, _map)
                     actions.select_default:replace(function()
@@ -47,7 +52,7 @@ M.select = function()
                 previewer = previewers.new_buffer_previewer({
                     title = "Describe",
                     dyn_title = function(_, entry)
-                        return "Describe - " .. entry.value
+                        return "Describe - " .. entry.display
                     end,
                     define_preview = function(self, entry, _status)
                         local preview_data = resources_namespace.get(entry.value)
