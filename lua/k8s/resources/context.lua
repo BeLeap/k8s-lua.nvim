@@ -1,7 +1,9 @@
 local kube_config = require("k8s.kube_config")
 
--- @field target string
-local M = {}
+-- @field target string|nil
+local M = {
+    target = nil,
+}
 
 -- get current context
 -- @return string|nil
