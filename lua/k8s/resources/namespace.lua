@@ -13,7 +13,7 @@ M.get = function(namespace)
 end
 
 -- @return array|nil
-M.list = function()
+M.list_name = function()
     local data = client.get("/api/v1/namespaces")
 
     if data ~= nil then

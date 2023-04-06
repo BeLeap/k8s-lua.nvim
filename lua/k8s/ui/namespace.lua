@@ -10,7 +10,7 @@ local resources_namespace = require("k8s.resources.namespace")
 local M = {}
 
 M.select = function()
-    local names = resources_namespace.list()
+    local names = resources_namespace.list_name()
 
     if names ~= nil then
         pickers
