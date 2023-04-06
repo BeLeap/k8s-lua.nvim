@@ -10,14 +10,18 @@ local resources_namespace = require("k8s.resources.namespace")
 local M = {}
 
 M.select = function()
-    local names = resources_namespace.list_name()
+    local names = resources_namespace.list_iter()
 
     if names ~= nil then
         pickers
             .new({}, {
                 prompt_title = "Namespaces",
                 finder = finders.new_table({
-                    results = names,
+                    results = names
+                        :map(function(item)
+                            return item.metadata.name
+                        end)
+                        :tolist(),
                     entry_maker = function(name)
                         local display = "  " .. name
                         if name == resources_namespace.target_namespace then
