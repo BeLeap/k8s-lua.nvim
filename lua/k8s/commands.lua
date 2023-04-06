@@ -1,5 +1,6 @@
 local ui_context = require("k8s.ui.context")
 local ui_namespace = require("k8s.ui.namespace")
+local ui_pod = require("k8s.ui.pod")
 
 local M = {
     commands = {
@@ -17,6 +18,13 @@ local M = {
             opts = {},
             command = function()
                 ui_namespace.select()
+            end,
+        },
+        {
+            name = "K8sPodList",
+            opts = {},
+            command = function()
+                ui_pod.select()
             end,
         },
     },
