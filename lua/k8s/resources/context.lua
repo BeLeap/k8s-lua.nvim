@@ -1,6 +1,6 @@
 local kube_config = require("k8s.kube_config")
 
--- @field target_context string
+-- @field target string
 local M = {}
 
 -- get current context
@@ -83,7 +83,7 @@ M.list = function()
 end
 
 M.setup = function(_config)
-    M.target_context = M.get_current()
+    M.target = M.get_current()
 end
 
 return M

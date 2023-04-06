@@ -19,7 +19,7 @@ M.select = function()
                 results = contexts,
                 entry_maker = function(context)
                     local display = "  " .. context
-                    if context == resources_context.target_context then
+                    if context == resources_context.target then
                         display = "* " .. context
                     end
 
@@ -35,7 +35,7 @@ M.select = function()
                 actions.select_default:replace(function()
                     actions.close(prompt_bufnr)
                     local selection = action_state.get_selected_entry()
-                    resources_context.target_context = selection.value
+                    resources_context.target = selection.value
                 end)
                 return true
             end,
