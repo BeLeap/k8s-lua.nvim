@@ -5,6 +5,7 @@ local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 local previewers = require("telescope.previewers")
 local detail_buffer = require("k8s.ui.detail_buffer")
+local preview_buffer = require("k8s.ui.preview_buffer")
 
 local resources_pod = require("k8s.resources.pod")
 
@@ -27,8 +28,18 @@ M.select = function()
                         end)
                         :tolist(),
                     entry_maker = function(entry)
+                        local value = vim.tbl_deep_extend("keep", entry, {
+                            preview_data_fetcher = {
+                                call = resources_pod.get,
+                                args = {
+                                    namespace = entry.namespace,
+                                    pod = entry.name,
+                                },
+                            },
+                        })
+
                         return {
-                            value = entry,
+                            value = value,
                             display = entry.name,
                             ordinal = entry.name,
                         }
@@ -38,7 +49,10 @@ M.select = function()
                 attach_mappings = function(prompt_bufnr, map)
                     map("n", "e", function()
                         local selection = action_state.get_selected_entry()
-                        local data = resources_pod.get(selection.value.namespace, selection.value.name)
+                        local data = resources_pod.get({
+                            namespace = selection.value.namespace,
+                            name = selection.value.name,
+                        })
 
                         local buffer = detail_buffer.create("pods", selection.value.name, data)
 
@@ -52,23 +66,7 @@ M.select = function()
                     end)
                     return true
                 end,
-                previewer = previewers.new_buffer_previewer({
-                    title = "Describe",
-                    dyn_title = function(_, entry)
-                        return "Describe - " .. entry.display
-                    end,
-                    define_preview = function(self, entry, _status)
-                        local preview_data = resources_pod.get(entry.value.namespace, entry.value.name)
-                        vim.api.nvim_buf_set_option(self.state.bufnr, "ft", "lua")
-                        vim.api.nvim_buf_set_lines(
-                            self.state.bufnr,
-                            0,
-                            -1,
-                            false,
-                            vim.fn.split(tostring(vim.inspect(preview_data)), "\n")
-                        )
-                    end,
-                }),
+                previewer = previewers.new_buffer_previewer(preview_buffer.previewer_opt_factory()),
             })
             :find()
     end

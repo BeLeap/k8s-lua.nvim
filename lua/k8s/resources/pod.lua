@@ -6,9 +6,13 @@ local resources_namespace = require("k8s.resources.namespace")
 
 local M = {}
 
-M.get = function(namespace, pod)
+M.get = function(args)
+    local pod = args.pod
+    local namespace = args.namespace
+
     vim.validate({
         pod = { pod, "string" },
+        namespace = { namespace, "string" },
     })
 
     return client.get("/api/v1/namespaces/" .. namespace .. "/pods/" .. tostring(pod))
