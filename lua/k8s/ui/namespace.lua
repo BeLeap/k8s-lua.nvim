@@ -39,7 +39,28 @@ M.select = function()
                 }),
                 default_selection_index = selected_idx,
                 sorter = conf.generic_sorter(),
-                attach_mappings = function(prompt_bufnr, _map)
+                attach_mappings = function(prompt_bufnr, map)
+                    map("n", "e", function()
+                        local selection = action_state.get_selected_entry()
+                        local data = resources_namespace.get(selection.value)
+
+                        local buffer = vim.api.nvim_create_buf(true, true)
+                        vim.api.nvim_buf_set_option(buffer, "ft", "lua")
+
+                        vim.api.nvim_buf_set_name(buffer, "namespace/" .. selection.value)
+
+                        vim.api.nvim_buf_set_lines(
+                            buffer,
+                            0,
+                            -1,
+                            false,
+                            vim.fn.split(tostring(vim.inspect(data)), "\n")
+                        )
+
+                        actions.close(prompt_bufnr)
+                        vim.api.nvim_set_current_buf(buffer)
+                    end)
+
                     actions.select_default:replace(function()
                         actions.close(prompt_bufnr)
                         local selection = action_state.get_selected_entry()
