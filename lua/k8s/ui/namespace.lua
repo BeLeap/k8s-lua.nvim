@@ -60,7 +60,7 @@ M.select = function()
                             namespace = selection.value.name,
                         })
 
-                        local buffer = detail_buffer.create("namespaces", selection.value.name, data)
+                        local buffer = detail_buffer.create("namespaces", selection.value.name, data, {})
                         actions.close(prompt_bufnr)
                         vim.api.nvim_set_current_buf(buffer)
                     end)
