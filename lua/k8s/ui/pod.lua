@@ -4,6 +4,7 @@ local conf = require("telescope.config").values
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 local previewers = require("telescope.previewers")
+local detail_buffer = require("k8s.ui.detail_buffer")
 
 local resources_pod = require("k8s.resources.pod")
 
@@ -39,18 +40,7 @@ M.select = function()
                         local selection = action_state.get_selected_entry()
                         local data = resources_pod.get(selection.value.namespace, selection.value.name)
 
-                        local buffer = vim.api.nvim_create_buf(true, true)
-                        vim.api.nvim_buf_set_option(buffer, "ft", "lua")
-
-                        vim.api.nvim_buf_set_name(buffer, "pods/" .. selection.value.name)
-
-                        vim.api.nvim_buf_set_lines(
-                            buffer,
-                            0,
-                            -1,
-                            false,
-                            vim.fn.split(tostring(vim.inspect(data)), "\n")
-                        )
+                        local buffer = detail_buffer.create("pods", selection.value.name, data)
 
                         actions.close(prompt_bufnr)
                         vim.api.nvim_set_current_buf(buffer)
