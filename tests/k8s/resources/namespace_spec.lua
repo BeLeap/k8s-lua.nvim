@@ -8,7 +8,9 @@ describe("namespace", function()
             local mock_client = mock(client, true)
             mock_client.get.returns({ "lorem ipsum" })
 
-            local result = namespace.get("foo")
+            local result = namespace.get({
+                namespace = "foo",
+            })
 
             assert.are.same({ "lorem ipsum" }, result)
             assert.stub(mock_client.get).was_called_with("/api/v1/namespaces/foo")

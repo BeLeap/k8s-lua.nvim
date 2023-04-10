@@ -14,7 +14,10 @@ describe("pod", function()
             local mock_client = mock(client, true)
             mock_client.get.returns({ "lorem ipsum" })
 
-            local result = pod.get("foo", "bar")
+            local result = pod.get({
+                namespace = "foo",
+                pod = "bar",
+            })
 
             assert.are.same({ "lorem ipsum" }, result)
             assert.stub(mock_client.get).was_called_with("/api/v1/namespaces/foo/pods/bar")
