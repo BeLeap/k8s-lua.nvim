@@ -47,7 +47,7 @@ M.select = function()
                         local buffer = vim.api.nvim_create_buf(true, true)
                         vim.api.nvim_buf_set_option(buffer, "ft", "lua")
 
-                        vim.api.nvim_buf_set_name(buffer, "namespace/" .. selection.value)
+                        vim.api.nvim_buf_set_name(buffer, "namespaces/" .. selection.value)
 
                         vim.api.nvim_buf_set_lines(
                             buffer,
