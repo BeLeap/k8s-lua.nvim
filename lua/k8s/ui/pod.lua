@@ -54,11 +54,9 @@ M.select = function()
                             pod = selection.value.name,
                         })
 
-                        local buffer = detail_buffer.create("pods", selection.value.name, data, {
-                            callback = function(_ev)
-                                print("Test")
-                            end,
-                        })
+                        local buffer = detail_buffer.create("pods", selection.value.name, data, function(ev)
+                            print(vim.inspect(ev))
+                        end)
 
                         actions.close(prompt_bufnr)
                         vim.api.nvim_set_current_buf(buffer)
