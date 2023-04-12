@@ -75,7 +75,6 @@ M.select = function()
                     actions.select_default:replace(function()
                         actions.close(prompt_bufnr)
                         local selection = action_state.get_selected_entry()
-                        print(vim.inspect(selection))
                     end)
                     return true
                 end,
