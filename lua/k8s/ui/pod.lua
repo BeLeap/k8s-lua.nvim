@@ -74,7 +74,6 @@ M.select = function()
                     end)
                     actions.select_default:replace(function()
                         actions.close(prompt_bufnr)
-                        local selection = action_state.get_selected_entry()
                     end)
                     return true
                 end,
