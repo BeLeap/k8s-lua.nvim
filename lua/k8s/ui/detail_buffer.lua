@@ -12,16 +12,13 @@ M.create = function(kind, name, data, on_write)
     vim.api.nvim_buf_set_lines(buffer, 0, -1, false, vim.fn.split(tostring(vim.inspect(data)), "\n"))
     vim.api.nvim_buf_set_option(buffer, "buftype", "")
 
-    local buffer_option = {
+    vim.api.nvim_create_autocmd({ "BufWriteCmd" }, {
         buffer = buffer,
-    }
-    local opts = vim.tbl_deep_extend("keep", au_opts or {}, {
         callback = function(ev)
             on_write(ev)
             vim.api.nvim_buf_delete(buffer, { force = true })
         end,
     })
-    vim.api.nvim_create_autocmd({ "BufWriteCmd" }, opts)
 
     return buffer
 end
