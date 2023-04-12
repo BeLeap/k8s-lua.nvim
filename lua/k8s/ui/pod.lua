@@ -4,6 +4,9 @@ local conf = require("telescope.config").values
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 local previewers = require("telescope.previewers")
+
+local utils = require("k8s.utils")
+
 local detail_buffer = require("k8s.ui.detail_buffer")
 local preview_buffer = require("k8s.ui.preview_buffer")
 
@@ -55,7 +58,15 @@ M.select = function()
                         })
 
                         local buffer = detail_buffer.create("pods", selection.value.name, data, function(ev)
-                            print(vim.inspect(ev))
+                            local content_lua_string =
+                                utils.join_to_string(vim.api.nvim_buf_get_lines(ev.buf, 0, -1, false))
+                            local content = vim.json.encode(load("return " .. content_lua_string)())
+
+                            resources_pod.patch({
+                                namespace = selection.value.namespace,
+                                pod = selection.value.name,
+                                body = content,
+                            })
                         end)
 
                         actions.close(prompt_bufnr)

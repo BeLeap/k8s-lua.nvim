@@ -15,7 +15,21 @@ M.get = function(args)
         namespace = { namespace, "string" },
     })
 
-    return client.get("/api/v1/namespaces/" .. namespace .. "/pods/" .. tostring(pod))
+    return client.get("/api/v1/namespaces/" .. namespace .. "/pods/" .. pod)
+end
+
+M.patch = function(args)
+    local pod = args.pod
+    local namespace = args.namespace
+    local body = args.body
+
+    vim.validate({
+        pod = { pod, "string" },
+        namespace = { namespace, "string" },
+        body = { body, "string" },
+    })
+
+    return client.patch("/api/v1/namespaces/" .. namespace .. "/pods/" .. pod, body)
 end
 
 -- @return iterator|nil

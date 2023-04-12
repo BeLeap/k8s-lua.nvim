@@ -52,6 +52,14 @@ M.shutdown = function()
     end
 end
 
+M.check = function()
+    M.update()
+
+    vim.wait(1000, function()
+        return M.port ~= nil
+    end, 100)
+end
+
 M.setup = function(_config)
     vim.api.nvim_create_autocmd("VimLeavePre", { callback = M.shutdown })
 end
