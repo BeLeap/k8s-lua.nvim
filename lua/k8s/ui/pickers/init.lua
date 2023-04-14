@@ -45,7 +45,6 @@ M.new = function(args)
                 return {
                     value = entry,
                     display = entry.metadata.name,
-                    -- display = tostring(default_selection_idx),
                     ordinal = entry.metadata.name,
                 }
             end,
