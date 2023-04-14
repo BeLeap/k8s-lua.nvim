@@ -4,7 +4,7 @@ local pickers = require("k8s.ui.pickers")
 local M = {}
 
 M.select = function()
-    local Picker = pickers.new({
+    local Picker = pickers:new({
         kind = "namespaces",
         resources = resources_namespace,
         when_select = function(selection)

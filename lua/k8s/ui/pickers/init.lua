@@ -8,50 +8,20 @@ local actions = require("telescope.actions")
 local utils = require("k8s.utils")
 local detail = require("k8s.ui.pickers.detail")
 
-local M = {}
+---@class ResourcesPicker
+---@field private resources table
+---@field private result table
+---@field public picker Picker
+local ResourcesPicker = {}
 
-M.new = function(args)
-    local instance = {}
-
-    local __kind = args.kind
-    local __resources = args.resources
-    local __when_select = args.when_select
-        or function(selection)
-            print("Selected " .. selection.display)
-        end
-    local __is_current = args.is_current or function(_entry)
-        return false
-    end
-
-    vim.validate({
-        __kind = { __kind, "string" },
-        __resources = { __resources, "table" },
-        __when_select = { __when_select, "function" },
-        __is_current = { __is_current, "function" },
-    })
-
-    ---@private
-    ---@type string
-    instance._kind = __kind
-    ---@private
-    ---@type table
-    instance._resources = __resources
-    ---@private
-    ---@type function
-    instance._when_select = __when_select
-    ---@private
-    ---@type function
-    instance._is_current = __is_current
-
-    ---@private
-    ---@type table
-    instance._preview_opts = {
+function ResourcesPicker:preview_opts_factory()
+    return {
         title = "detail",
         dyn_title = function(_, entry)
             return "detail - " .. entry.display
         end,
         define_preview = function(preview, entry, _status)
-            local preview_data = instance._resources.get(entry.value)
+            local preview_data = self.resources.get(entry.value)
 
             vim.api.nvim_buf_set_option(preview.state.bufnr, "ft", "lua")
             vim.api.nvim_buf_set_lines(
@@ -63,26 +33,41 @@ M.new = function(args)
             )
         end,
     }
+end
 
-    ---@private
-    ---@type table
-    instance._results = instance._resources.list_iter():tolist()
+function ResourcesPicker:new(args)
+    -- self = self or {}
 
-    ---@private
-    ---@type integer
-    instance._default_selection_index = 0
-    for i, elem in ipairs(instance._results) do
-        if instance._is_current(elem) then
-            instance._default_selection_index = i
+    local kind = args.kind
+    local _resources = args.resources
+    local when_select = args.when_select or function(selection)
+        print("Selected " .. selection.display)
+    end
+    local is_current = args.is_current or function(_entry)
+        return false
+    end
+
+    vim.validate({
+        kind = { kind, "string" },
+        _resources = { _resources, "table" },
+        when_select = { when_select, "function" },
+        is_current = { is_current, "function" },
+    })
+
+    self.resources = _resources
+    self.results = self.resources.list_iter():tolist()
+
+    local default_selection_index = 0
+    for i, elem in ipairs(self.results) do
+        if is_current(elem) then
+            default_selection_index = i
         end
     end
 
-    ---@public
-    ---@type Picker
-    instance.picker = pickers.new({}, {
-        prompt_title = instance._kind,
+    self.picker = pickers.new({}, {
+        prompt_title = kind,
         finder = finders.new_table({
-            results = instance._results,
+            results = self.results,
             entry_maker = function(entry)
                 return {
                     value = entry,
@@ -91,20 +76,20 @@ M.new = function(args)
                 }
             end,
         }),
-        default_selection_index = instance._default_selection_index,
+        default_selection_index = default_selection_index,
         sorter = conf.generic_sorter(),
         attach_mappings = function(prompt_bufnr, map)
             map("n", "e", function()
                 local selection = action_state.get_selected_entry()
-                local data = instance._resources.get(selection.value)
+                local data = self.resources.get(selection.value)
 
-                local buffer = detail.create(instance._kind, data, function(ev)
-                    if instance._resources.patch ~= nil then
+                local buffer = detail.create(kind, data, function(ev)
+                    if self.resources.patch ~= nil then
                         local content_raw = utils.join_to_string(vim.api.nvim_buf_get_lines(ev.buf, 0, -1, false))
                         local content = load("return " .. content_raw)()
                         local diff = utils.calculate_diffs(data, content)
 
-                        instance._resources.patch({
+                        self.resources.patch({
                             target = selection.value,
                             body = vim.json.encode(diff),
                         })
@@ -118,15 +103,15 @@ M.new = function(args)
                 actions.close(prompt_bufnr)
 
                 local selection = action_state.get_selected_entry()
-                instance._when_select(selection)
+                when_select(selection)
             end)
 
             return true
         end,
-        previewer = previewers.new_buffer_previewer(instance._preview_opts),
+        previewer = previewers.new_buffer_previewer(self:preview_opts_factory()),
     })
 
-    return instance
+    return self
 end
 
-return M
+return ResourcesPicker
