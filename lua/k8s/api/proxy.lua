@@ -10,16 +10,16 @@ local M = {
     started = false,
     _handle = nil,
     port = nil,
-    current_context = nil,
+    running_context = nil,
 }
 
 M.start = function()
-    M.current_context = resources_context.target
+    M.running_context = resources_context.current_name
 
     M._handle = Job:new({
         command = "kubectl",
         args = {
-            "--context=" .. M.current_context,
+            "--context=" .. M.running_context,
             "proxy",
             "--port=0",
         },
@@ -33,7 +33,7 @@ M.start = function()
 end
 
 M.update = function()
-    if M.started == true and M.current_context == resources_context.target then
+    if M.started == true and M.running_context == resources_context.current_name then
         return
     end
 

@@ -2,9 +2,9 @@ local iterators = require("plenary.iterators")
 
 local client = require("k8s.api.client")
 
--- @field target string|nil
+-- @field current_name string|nil
 local M = {
-    target = nil,
+    current_name = nil,
 }
 
 M.get = function(target)

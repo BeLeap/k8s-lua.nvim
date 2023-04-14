@@ -9,7 +9,14 @@ M.select = function()
         kind = "Namespaces",
         resources = resources_namespace,
         when_select = function(selection)
-            resources_namespace.target = selection.value.metadata.name
+            resources_namespace.current_name = selection.value.metadata.name
+        end,
+        is_current = function(entry)
+            if entry.metadata.name == resources_namespace.current_name then
+                return true
+            end
+
+            return false
         end,
     })
 

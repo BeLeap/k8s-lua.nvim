@@ -45,8 +45,8 @@ end
 -- @return iterator|nil
 M.list_iter = function()
     local data
-    if resources_namespace.target ~= nil then
-        data = client.get("/api/v1/namespaces/" .. resources_namespace.target .. "/pods")
+    if resources_namespace.current_name ~= nil then
+        data = client.get("/api/v1/namespaces/" .. resources_namespace.current_name .. "/pods")
     else
         data = client.get("/api/v1/pods")
     end

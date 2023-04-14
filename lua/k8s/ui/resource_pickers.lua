@@ -16,27 +16,41 @@ M.new = function(args)
     local when_select = args.when_select or function(selection)
         print("Selected " .. selection.display)
     end
+    local is_current = args.is_current or function(_entry)
+        return false
+    end
 
     vim.validate({
         kind = { kind, "string" },
         resources = { resources, "table" },
         when_select = { when_select, "function" },
+        is_current = { is_current, "function" },
     })
 
-    local list = resources.list_iter()
+    local iter = resources.list_iter()
+    local results = iter:tolist()
+
+    local default_selection_index = 0
+    for i, elem in ipairs(results) do
+        if is_current(elem) then
+            default_selection_index = i
+        end
+    end
 
     local picker = pickers.new({}, {
         prompt_title = kind,
         finder = finders.new_table({
-            results = list:tolist(),
+            results = results,
             entry_maker = function(entry)
                 return {
                     value = entry,
                     display = entry.metadata.name,
+                    -- display = tostring(default_selection_idx),
                     ordinal = entry.metadata.name,
                 }
             end,
         }),
+        default_selection_index = default_selection_index,
         sorter = conf.generic_sorter(),
         attach_mappings = function(prompt_bufnr, map)
             map("n", "e", function()

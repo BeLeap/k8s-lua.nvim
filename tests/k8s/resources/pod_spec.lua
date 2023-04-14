@@ -6,7 +6,7 @@ local resources_namespace = require("k8s.resources.namespace")
 
 describe("pod", function()
     after_each(function()
-        resources_namespace.target = nil
+        resources_namespace.current_name = nil
     end)
 
     it("get", function()
@@ -46,7 +46,7 @@ describe("pod", function()
         end)
 
         it("should request pods info with namespace if namespace target exists", function()
-            resources_namespace.target = "foo"
+            resources_namespace.current_name = "foo"
 
             local mock_client = mock(client, true)
             mock_client.get.returns({
