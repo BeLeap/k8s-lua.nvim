@@ -31,7 +31,7 @@ M.patch = function(path, body)
     local url = "localhost:" .. tostring(proxy.port) .. path
     local res = curl.patch(url, {
         headers = {
-            ["Content-Type"] = "application/merge-patch+json",
+            ["Content-Type"] = "application/json-patch+json",
         },
         body = body,
     })

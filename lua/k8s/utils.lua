@@ -40,10 +40,13 @@ end
 M.calculate_diffs = function(original, new)
     if type(original) ~= "table" or type(new) ~= "table" then
         local diff = {
-            op = "",
             path = "",
-            value = new,
         }
+
+        if new ~= nil then
+            diff.value = new
+        end
+
         if original ~= nil and new ~= nil then
             diff.op = "replace"
         elseif original ~= nil and new == nil then

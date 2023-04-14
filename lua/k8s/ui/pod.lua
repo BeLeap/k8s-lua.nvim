@@ -60,12 +60,13 @@ M.select = function()
                         local buffer = detail_buffer.create("pods", selection.value.name, data, function(ev)
                             local content_lua_string =
                                 utils.join_to_string(vim.api.nvim_buf_get_lines(ev.buf, 0, -1, false))
-                            local content = vim.json.encode(load("return " .. content_lua_string)())
+                            local content = load("return " .. content_lua_string)()
+                            local diff = utils.calculate_diffs(data, content)
 
                             resources_pod.patch({
                                 namespace = selection.value.namespace,
                                 pod = selection.value.name,
-                                body = content,
+                                body = vim.json.encode(diff),
                             })
                         end)
 
