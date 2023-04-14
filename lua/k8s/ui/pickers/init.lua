@@ -37,7 +37,7 @@ end
 
 function ResourcesPicker:new(args)
     local kind = args.kind
-    local _resources = args.resources
+    local resources = args.resources
     local when_select = args.when_select or function(selection)
         print("Selected " .. selection.display)
     end
@@ -47,12 +47,12 @@ function ResourcesPicker:new(args)
 
     vim.validate({
         kind = { kind, "string" },
-        _resources = { _resources, "table" },
+        resources = { resources, "table" },
         when_select = { when_select, "function" },
         is_current = { is_current, "function" },
     })
 
-    self.resources = _resources
+    self.resources = resources
     self.results = self.resources.list_iter():tolist()
 
     local default_selection_index = 0
