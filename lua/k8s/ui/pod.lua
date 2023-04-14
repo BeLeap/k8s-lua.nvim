@@ -1,10 +1,10 @@
 local resources_pod = require("k8s.resources.pod")
-local resource_pickers = require("k8s.ui.resource_pickers")
+local pickers = require("k8s.ui.pickers")
 
 local M = {}
 
 M.select = function()
-    local picker = resource_pickers.new({
+    local picker = pickers.new({
         kind = "Pods",
         resources = resources_pod,
     })

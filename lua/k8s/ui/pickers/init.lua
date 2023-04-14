@@ -6,7 +6,7 @@ local action_state = require("telescope.actions.state")
 local actions = require("telescope.actions")
 
 local utils = require("k8s.utils")
-local detail_buffer = require("k8s.ui.detail_buffer")
+local detail = require("k8s.ui.pickers.detail")
 
 local M = {}
 
@@ -57,7 +57,7 @@ M.new = function(args)
                 local selection = action_state.get_selected_entry()
                 local data = resources.get(selection.value)
 
-                local buffer = detail_buffer.create(kind, selection.value.metadata.name, data, function(ev)
+                local buffer = detail.create(kind, selection.value.metadata.name, data, function(ev)
                     if resources.patch ~= nil then
                         local content_raw = utils.join_to_string(vim.api.nvim_buf_get_lines(ev.buf, 0, -1, false))
                         local content = load("return " .. content_raw)()
