@@ -9,7 +9,9 @@ describe("namespace", function()
             mock_client.get.returns({ "lorem ipsum" })
 
             local result = namespace.get({
-                namespace = "foo",
+                metadata = {
+                    name = "foo",
+                },
             })
 
             assert.are.same({ "lorem ipsum" }, result)

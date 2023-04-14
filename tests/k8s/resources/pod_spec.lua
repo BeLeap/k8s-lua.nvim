@@ -15,8 +15,10 @@ describe("pod", function()
             mock_client.get.returns({ "lorem ipsum" })
 
             local result = pod.get({
-                namespace = "foo",
-                pod = "bar",
+                metadata = {
+                    namespace = "foo",
+                    name = "bar",
+                },
             })
 
             assert.are.same({ "lorem ipsum" }, result)
