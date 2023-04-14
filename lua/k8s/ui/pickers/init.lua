@@ -36,8 +36,6 @@ function ResourcesPicker:preview_opts_factory()
 end
 
 function ResourcesPicker:new(args)
-    -- self = self or {}
-
     local kind = args.kind
     local _resources = args.resources
     local when_select = args.when_select or function(selection)
