@@ -11,6 +11,8 @@ local detail = require("k8s.ui.pickers.detail")
 local M = {}
 
 M.new = function(args)
+    local instance = {}
+
     local kind = args.kind
     local resources = args.resources
     local when_select = args.when_select or function(selection)
@@ -27,17 +29,12 @@ M.new = function(args)
         is_current = { is_current, "function" },
     })
 
-    local iter = resources.list_iter()
-    local results = iter:tolist()
+    instance.kind = kind
+    instance.resources = resources
+    instance.when_select = when_select
+    instance.is_current = is_current
 
-    local default_selection_index = 0
-    for i, elem in ipairs(results) do
-        if is_current(elem) then
-            default_selection_index = i
-        end
-    end
-
-    local preview_opts = {
+    instance.preview_opts = {
         title = "detail",
         dyn_title = function(_, entry)
             return "detail - " .. entry.display
@@ -56,7 +53,17 @@ M.new = function(args)
         end,
     }
 
-    local picker = pickers.new({}, {
+    local iter = resources.list_iter()
+    local results = iter:tolist()
+
+    local default_selection_index = 0
+    for i, elem in ipairs(results) do
+        if is_current(elem) then
+            default_selection_index = i
+        end
+    end
+
+    instance.picker = pickers.new({}, {
         prompt_title = kind,
         finder = finders.new_table({
             results = results,
@@ -100,10 +107,10 @@ M.new = function(args)
 
             return true
         end,
-        previewer = previewers.new_buffer_previewer(preview_opts),
+        previewer = previewers.new_buffer_previewer(instance.preview_opts),
     })
 
-    return picker
+    return instance
 end
 
 return M

@@ -4,11 +4,11 @@ local pickers = require("k8s.ui.pickers")
 local M = {}
 
 M.select = function()
-    local picker = pickers.new({
+    local Picker = pickers.new({
         kind = "pods",
         resources = resources_pod,
     })
-    picker:find()
+    Picker.picker:find()
 end
 
 return M
