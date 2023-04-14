@@ -7,14 +7,14 @@ local M = {
     target = nil,
 }
 
-M.get = function(args)
-    local namespace = args.namespace
+M.get = function(target)
+    local name = target.metadata.name
 
     vim.validate({
-        namespace = { namespace, "string" },
+        name = { name, "string" },
     })
 
-    return client.get("/api/v1/namespaces/" .. namespace)
+    return client.get("/api/v1/namespaces/" .. name)
 end
 
 -- @return iterator|nil
