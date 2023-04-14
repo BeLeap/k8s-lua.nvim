@@ -5,7 +5,7 @@ local M = {}
 
 M.select = function()
     local picker = pickers.new({
-        kind = "Pods",
+        kind = "pods",
         resources = resources_pod,
     })
     picker:find()

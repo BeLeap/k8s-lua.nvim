@@ -5,7 +5,7 @@ local M = {}
 
 M.select = function()
     local picker = pickers.new({
-        kind = "Namespaces",
+        kind = "namespaces",
         resources = resources_namespace,
         when_select = function(selection)
             resources_namespace.current_name = selection.value.metadata.name

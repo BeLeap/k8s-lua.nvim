@@ -37,6 +37,25 @@ M.new = function(args)
         end
     end
 
+    local preview_opts = {
+        title = "detail",
+        dyn_title = function(_, entry)
+            return "detail - " .. entry.display
+        end,
+        define_preview = function(preview, entry, _status)
+            local preview_data = resources.get(entry.value)
+
+            vim.api.nvim_buf_set_option(preview.state.bufnr, "ft", "lua")
+            vim.api.nvim_buf_set_lines(
+                preview.state.bufnr,
+                0,
+                -1,
+                false,
+                vim.fn.split(tostring(vim.inspect(preview_data)), "\n")
+            )
+        end,
+    }
+
     local picker = pickers.new({}, {
         prompt_title = kind,
         finder = finders.new_table({
@@ -56,7 +75,7 @@ M.new = function(args)
                 local selection = action_state.get_selected_entry()
                 local data = resources.get(selection.value)
 
-                local buffer = detail.create(kind, selection.value.metadata.name, data, function(ev)
+                local buffer = detail.create(kind, data, function(ev)
                     if resources.patch ~= nil then
                         local content_raw = utils.join_to_string(vim.api.nvim_buf_get_lines(ev.buf, 0, -1, false))
                         local content = load("return " .. content_raw)()
@@ -81,24 +100,7 @@ M.new = function(args)
 
             return true
         end,
-        previewer = previewers.new_buffer_previewer({
-            title = "Describe",
-            dyn_title = function(_, entry)
-                return "Describe - " .. entry.display
-            end,
-            define_preview = function(self, entry, _status)
-                local preview_data = resources.get(entry.value)
-
-                vim.api.nvim_buf_set_option(self.state.bufnr, "ft", "lua")
-                vim.api.nvim_buf_set_lines(
-                    self.state.bufnr,
-                    0,
-                    -1,
-                    false,
-                    vim.fn.split(tostring(vim.inspect(preview_data)), "\n")
-                )
-            end,
-        }),
+        previewer = previewers.new_buffer_previewer(preview_opts),
     })
 
     return picker
