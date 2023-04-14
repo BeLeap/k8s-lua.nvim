@@ -9,10 +9,33 @@ local utils = require("k8s.utils")
 local detail = require("k8s.ui.pickers.detail")
 
 ---@class ResourcesPicker
+---@field private kind table
 ---@field private resources table
 ---@field private result table
 ---@field public picker Picker
 local ResourcesPicker = {}
+
+function ResourcesPicker:edit_action(prompt_bufnr)
+    return function()
+        local selection = action_state.get_selected_entry()
+        local data = self.resources.get(selection.value)
+
+        local buffer = detail.create(self.kind, data, function(ev)
+            if self.resources.patch ~= nil then
+                local content_raw = utils.join_to_string(vim.api.nvim_buf_get_lines(ev.buf, 0, -1, false))
+                local content = load("return " .. content_raw)()
+                local diff = utils.calculate_diffs(data, content)
+
+                self.resources.patch({
+                    target = selection.value,
+                    body = vim.json.encode(diff),
+                })
+            end
+        end)
+        actions.close(prompt_bufnr)
+        vim.api.nvim_set_current_buf(buffer)
+    end
+end
 
 function ResourcesPicker:preview_opts_factory()
     return {
@@ -52,6 +75,7 @@ function ResourcesPicker:new(args)
         is_current = { is_current, "function" },
     })
 
+    self.kind = kind
     self.resources = resources
     self.results = self.resources.list_iter():tolist()
 
@@ -77,25 +101,7 @@ function ResourcesPicker:new(args)
         default_selection_index = default_selection_index,
         sorter = conf.generic_sorter(),
         attach_mappings = function(prompt_bufnr, map)
-            map("n", "e", function()
-                local selection = action_state.get_selected_entry()
-                local data = self.resources.get(selection.value)
-
-                local buffer = detail.create(kind, data, function(ev)
-                    if self.resources.patch ~= nil then
-                        local content_raw = utils.join_to_string(vim.api.nvim_buf_get_lines(ev.buf, 0, -1, false))
-                        local content = load("return " .. content_raw)()
-                        local diff = utils.calculate_diffs(data, content)
-
-                        self.resources.patch({
-                            target = selection.value,
-                            body = vim.json.encode(diff),
-                        })
-                    end
-                end)
-                actions.close(prompt_bufnr)
-                vim.api.nvim_set_current_buf(buffer)
-            end)
+            map("n", "e", self:edit_action(prompt_bufnr))
 
             actions.select_default:replace(function()
                 actions.close(prompt_bufnr)
