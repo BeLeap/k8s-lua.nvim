@@ -13,34 +13,45 @@ local M = {}
 M.new = function(args)
     local instance = {}
 
-    local kind = args.kind
-    local resources = args.resources
-    local when_select = args.when_select or function(selection)
-        print("Selected " .. selection.display)
-    end
-    local is_current = args.is_current or function(_entry)
+    local __kind = args.kind
+    local __resources = args.resources
+    local __when_select = args.when_select
+        or function(selection)
+            print("Selected " .. selection.display)
+        end
+    local __is_current = args.is_current or function(_entry)
         return false
     end
 
     vim.validate({
-        kind = { kind, "string" },
-        resources = { resources, "table" },
-        when_select = { when_select, "function" },
-        is_current = { is_current, "function" },
+        __kind = { __kind, "string" },
+        __resources = { __resources, "table" },
+        __when_select = { __when_select, "function" },
+        __is_current = { __is_current, "function" },
     })
 
-    instance.kind = kind
-    instance.resources = resources
-    instance.when_select = when_select
-    instance.is_current = is_current
+    ---@private
+    ---@type string
+    instance._kind = __kind
+    ---@private
+    ---@type table
+    instance._resources = __resources
+    ---@private
+    ---@type function
+    instance._when_select = __when_select
+    ---@private
+    ---@type function
+    instance._is_current = __is_current
 
-    instance.preview_opts = {
+    ---@private
+    ---@type table
+    instance._preview_opts = {
         title = "detail",
         dyn_title = function(_, entry)
             return "detail - " .. entry.display
         end,
         define_preview = function(preview, entry, _status)
-            local preview_data = resources.get(entry.value)
+            local preview_data = instance._resources.get(entry.value)
 
             vim.api.nvim_buf_set_option(preview.state.bufnr, "ft", "lua")
             vim.api.nvim_buf_set_lines(
@@ -53,20 +64,25 @@ M.new = function(args)
         end,
     }
 
-    local iter = resources.list_iter()
-    local results = iter:tolist()
+    ---@private
+    ---@type table
+    instance._results = instance._resources.list_iter():tolist()
 
-    local default_selection_index = 0
-    for i, elem in ipairs(results) do
-        if is_current(elem) then
-            default_selection_index = i
+    ---@private
+    ---@type integer
+    instance._default_selection_index = 0
+    for i, elem in ipairs(instance._results) do
+        if instance._is_current(elem) then
+            instance._default_selection_index = i
         end
     end
 
+    ---@public
+    ---@type Picker
     instance.picker = pickers.new({}, {
-        prompt_title = kind,
+        prompt_title = instance._kind,
         finder = finders.new_table({
-            results = results,
+            results = instance._results,
             entry_maker = function(entry)
                 return {
                     value = entry,
@@ -75,20 +91,20 @@ M.new = function(args)
                 }
             end,
         }),
-        default_selection_index = default_selection_index,
+        default_selection_index = instance._default_selection_index,
         sorter = conf.generic_sorter(),
         attach_mappings = function(prompt_bufnr, map)
             map("n", "e", function()
                 local selection = action_state.get_selected_entry()
-                local data = resources.get(selection.value)
+                local data = instance._resources.get(selection.value)
 
-                local buffer = detail.create(kind, data, function(ev)
-                    if resources.patch ~= nil then
+                local buffer = detail.create(instance._kind, data, function(ev)
+                    if instance._resources.patch ~= nil then
                         local content_raw = utils.join_to_string(vim.api.nvim_buf_get_lines(ev.buf, 0, -1, false))
                         local content = load("return " .. content_raw)()
                         local diff = utils.calculate_diffs(data, content)
 
-                        resources.patch({
+                        instance._resources.patch({
                             target = selection.value,
                             body = vim.json.encode(diff),
                         })
@@ -102,12 +118,12 @@ M.new = function(args)
                 actions.close(prompt_bufnr)
 
                 local selection = action_state.get_selected_entry()
-                when_select(selection)
+                instance._when_select(selection)
             end)
 
             return true
         end,
-        previewer = previewers.new_buffer_previewer(instance.preview_opts),
+        previewer = previewers.new_buffer_previewer(instance._preview_opts),
     })
 
     return instance
