@@ -42,4 +42,33 @@ describe("utils", function()
             assert.are.same(expected_hash, hash)
         end)
     end)
+
+    it("calculate_diffs", function()
+        local original = {
+            lorem = {
+                ipsum = {
+                    common = "common",
+                    dolor = "foo",
+                    dolor1 = "test",
+                },
+            },
+        }
+        local new = {
+            lorem = {
+                ipsum = {
+                    common = "common",
+                    dolor = "bar",
+                    dolor2 = "test",
+                },
+            },
+        }
+
+        local diffs = utils.calculate_diffs(original, new)
+
+        assert.are.same({
+            { op = "replace", path = "/lorem/ipsum/dolor", value = "bar" },
+            { op = "remove", path = "/lorem/ipsum/dolor1" },
+            { op = "add", path = "/lorem/ipsum/dolor2", value = "test" },
+        }, diffs)
+    end)
 end)
