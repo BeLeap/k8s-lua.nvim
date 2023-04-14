@@ -14,6 +14,29 @@ M.join_to_string = function(data)
     return table.concat(content, "\n")
 end
 
+M.union = function(list1, list2)
+    local result = {}
+    local hash = {}
+
+    -- add items from list1
+    for _, item in ipairs(list1) do
+        if not hash[item] then
+            table.insert(result, item)
+            hash[item] = true
+        end
+    end
+
+    -- add items from list2
+    for _, item in ipairs(list2) do
+        if not hash[item] then
+            table.insert(result, item)
+            hash[item] = true
+        end
+    end
+
+    return result
+end
+
 M.calculate_diffs = function(original, new)
     if type(original) ~= "table" or type(new) ~= "table" then
         local diff = {
@@ -34,11 +57,7 @@ M.calculate_diffs = function(original, new)
 
     local original_keys = vim.tbl_keys(original)
     local new_keys = vim.tbl_keys(new)
-    local keys = vim.tbl_extend("keep", original_keys, new_keys)
-
-    print(vim.inspect(original_keys))
-    print(vim.inspect(new_keys))
-    print(vim.inspect(keys))
+    local keys = M.union(original_keys, new_keys)
 
     local diffs = {}
     for _, key in ipairs(keys) do
@@ -55,4 +74,5 @@ M.calculate_diffs = function(original, new)
 
     return diffs
 end
+
 return M
