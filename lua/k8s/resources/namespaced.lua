@@ -4,13 +4,23 @@ local client = require("k8s.api.client")
 
 local resources_namespace = require("k8s.resources.namespace")
 
-local M = {}
+---@class NamespacedResource
+---@field kind string
+local NamespacedResource = {}
 
----@param kind string
----@param metadata KubernetesObjectMeta
-M.get = function(kind, metadata)
+function NamespacedResource:new(kind)
     vim.validate({
         kind = { kind, "string" },
+    })
+
+    self.kind = kind
+
+    return self
+end
+
+---@param metadata KubernetesObjectMeta
+function NamespacedResource:get(metadata)
+    vim.validate({
         metadata = { metadata, "table" },
     })
 
@@ -21,42 +31,34 @@ M.get = function(kind, metadata)
         namespace = { namespace, "string" },
     })
 
-    return client.get("/api/v1/namespaces/" .. namespace .. "/" .. kind .. "/" .. name)
+    return client.get("/api/v1/namespaces/" .. namespace .. "/" .. self.kind .. "/" .. name)
 end
 
----@param kind string
 ---@param metadata KubernetesObjectMeta
 ---@param body string
-M.patch = function(kind, metadata, body)
+function NamespacedResource:patch(metadata, body)
     vim.validate({
-        kind = { kind, "string" },
         target = { metadata, "table" },
         body = { body, "string" },
     })
 
-    local namespace = metadata.namespace
     local name = metadata.name
-
+    local namespace = metadata.namespace
     vim.validate({
         namespace = { namespace, "string" },
         name = { name, "string" },
     })
 
-    return client.patch("/api/v1/namespaces/" .. namespace .. "/" .. kind .. "/" .. name, body)
+    return client.patch("/api/v1/namespaces/" .. namespace .. "/" .. self.kind .. "/" .. name, body)
 end
 
----@param kind string
 ---@return Iterator|nil
-M.list_iter = function(kind)
-    vim.validate({
-        kind = { kind, "string" },
-    })
-
+function NamespacedResource:list_iter()
     local data
     if resources_namespace.current_name ~= nil then
-        data = client.get("/api/v1/namespaces/" .. resources_namespace.current_name .. "/" .. kind)
+        data = client.get("/api/v1/namespaces/" .. resources_namespace.current_name .. "/" .. self.kind)
     else
-        data = client.get("/api/v1/" .. kind)
+        data = client.get("/api/v1/" .. self.kind)
     end
 
     if data ~= nil then
@@ -64,4 +66,4 @@ M.list_iter = function(kind)
     end
 end
 
-return M
+return NamespacedResource
