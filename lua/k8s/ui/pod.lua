@@ -1,13 +1,11 @@
-local resources_pod = require("k8s.resources.pod")
 local pickers = require("k8s.ui.pickers")
+local NamespacedResource = require("k8s.resources.namespaced")
 
 local M = {}
 
 M.select = function()
-    local Picker = pickers:new({
-        kind = "pods",
-        resources = resources_pod,
-    })
+    local pods = NamespacedResource:new("pods")
+    local Picker = pickers:new(pods)
     Picker.picker:find()
 end
 

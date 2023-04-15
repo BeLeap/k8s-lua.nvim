@@ -19,6 +19,7 @@ function NamespacedResource:new(kind)
 end
 
 ---@param metadata KubernetesObjectMeta
+---@return KubernetesObject
 function NamespacedResource:get(metadata)
     vim.validate({
         metadata = { metadata, "table" },
