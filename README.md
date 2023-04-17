@@ -23,7 +23,7 @@
 
 ### Format
 
-[stylua](https://github.com/JohnnyMorganz/StyLuahttps://github.com/JohnnyMorganz/StyLua)
+Uses [stylua](https://github.com/JohnnyMorganz/StyLuahttps://github.com/JohnnyMorganz/StyLua)
 
 ```sh
 stylua .
