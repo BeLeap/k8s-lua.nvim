@@ -5,7 +5,7 @@ local M = {
             opts = {
                 nargs = "*",
                 complete = function(arglead, line)
-                    local resources = { "context", "namespace", "pod", "deployment", "statefulset" }
+                    local resources = { "context", "namespace", "pod", "deployment", "statefulset", "service" }
 
                     local match = {}
                     if arglead ~= nil then
