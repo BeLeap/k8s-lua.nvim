@@ -1,30 +1,11 @@
-local ui_context = require("k8s.ui.context")
-local ui_namespace = require("k8s.ui.namespace")
-
 local M = {
     commands = {
-        {
-            name = "KubeContextSelect",
-            opts = {
-                desc = "select target context",
-            },
-            command = function()
-                ui_context.select()
-            end,
-        },
-        {
-            name = "KubeNamespaceSelect",
-            opts = {},
-            command = function()
-                ui_namespace.select()
-            end,
-        },
         {
             name = "Kube",
             opts = {
                 nargs = "*",
                 complete = function(arglead, line)
-                    return { "pod", "deployment", "statefulset" }
+                    return { "context", "namespace", "pod", "deployment", "statefulset" }
                 end,
             },
             command = function(opts)
