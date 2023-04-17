@@ -4,6 +4,7 @@ local conf = require("telescope.config").values
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 
+local global_contexts = require("k8s.global_contexts")
 local resources_context = require("k8s.resources.context")
 
 local M = {}
@@ -19,7 +20,7 @@ M.select = function()
                 results = contexts,
                 entry_maker = function(context)
                     local display = "  " .. context
-                    if context == resources_context.current_name then
+                    if context == global_contexts.selected_contexts then
                         display = "* " .. context
                     end
 
@@ -35,7 +36,7 @@ M.select = function()
                 actions.select_default:replace(function()
                     actions.close(prompt_bufnr)
                     local selection = action_state.get_selected_entry()
-                    resources_context.current_name = selection.value
+                    global_contexts.selected_contexts = selection.value
                 end)
                 return true
             end,
