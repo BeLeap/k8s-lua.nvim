@@ -65,10 +65,43 @@ describe("utils", function()
 
         local diffs = utils.calculate_diffs(original, new)
 
-        assert.are.same({
-            { op = "replace", path = "/lorem/ipsum/dolor", value = "bar" },
-            { op = "remove", path = "/lorem/ipsum/dolor1" },
-            { op = "add", path = "/lorem/ipsum/dolor2", value = "test" },
-        }, diffs)
+        ---@param diff Diff
+        ---@return string
+        local function diff_stringify(diff)
+            local op = diff.op
+            local path = diff.path
+            local value = diff.value
+
+            local result = "op=" .. op .. " path=" .. path
+            if value ~= nil then
+                result = result .. " value=" .. value
+            end
+
+            return result
+        end
+
+        ---@type string[]
+        local expected_diffs = {
+            diff_stringify({ op = "replace", path = "/lorem/ipsum/dolor", value = "bar" }),
+            diff_stringify({ op = "remove", path = "/lorem/ipsum/dolor1" }),
+            diff_stringify({ op = "add", path = "/lorem/ipsum/dolor2", value = "test" }),
+        }
+
+        local hash = {}
+        for _, diff in ipairs(diffs) do
+            local diff_string = diff_stringify(diff)
+
+            if vim.tbl_contains(expected_diffs, diff_string) then
+                hash[diff_string] = true
+            else
+                assert(false, "calculated diff is not exists in expected diffs")
+            end
+        end
+
+        for _, expected_diff in ipairs(expected_diffs) do
+            if not hash[expected_diff] then
+                assert(false, "expected diffs are not covered")
+            end
+        end
     end)
 end)

@@ -37,6 +37,14 @@ M.union = function(list1, list2)
     return result
 end
 
+---@class Diff
+---@field op string
+---@field path string
+---@field value string|nil
+
+---@param original any
+---@param new any
+---@return Diff[]
 M.calculate_diffs = function(original, new)
     if type(original) ~= "table" or type(new) ~= "table" then
         local diff = {
