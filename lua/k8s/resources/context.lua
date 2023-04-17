@@ -1,11 +1,12 @@
 local kube_config = require("k8s.kube_config")
 
+---@module 'context'
 local M = {}
 
 -- get current context
 ---@return string|nil
 M.get_current = function()
-    local parser, tree = kube_config._load_config()
+    local parser, tree = kube_config.load_config()
 
     local ts_query = [[
 (document
@@ -36,7 +37,7 @@ end
 
 -- get list of contexts
 M.list = function()
-    local parser, tree = kube_config._load_config()
+    local parser, tree = kube_config.load_config()
 
     local ts_query = [[
 (document
