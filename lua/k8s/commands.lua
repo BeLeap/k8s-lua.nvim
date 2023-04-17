@@ -6,7 +6,7 @@ local ui_deployment = require("k8s.ui.deployment")
 local M = {
     commands = {
         {
-            name = "K8sContextSelect",
+            name = "KubeContextSelect",
             opts = {
                 desc = "select target context",
             },
@@ -15,21 +15,21 @@ local M = {
             end,
         },
         {
-            name = "K8sNamespaceSelect",
+            name = "KubeNamespaceSelect",
             opts = {},
             command = function()
                 ui_namespace.select()
             end,
         },
         {
-            name = "K8sPodList",
+            name = "KubePodList",
             opts = {},
             command = function()
                 ui_pod.select()
             end,
         },
         {
-            name = "K8sDeploymentList",
+            name = "KubeDeploymentList",
             opts = {},
             command = function()
                 ui_deployment.select()
