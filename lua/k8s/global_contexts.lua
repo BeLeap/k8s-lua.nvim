@@ -1,4 +1,5 @@
 local context = require("k8s.resources.context")
+
 ---@class GlobalContext
 ---@field selected_contexts string|nil
 ---@field selected_namepace string
