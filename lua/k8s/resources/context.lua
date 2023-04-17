@@ -1,12 +1,9 @@
 local kube_config = require("k8s.kube_config")
 
--- @field current_name string|nil
-local M = {
-    current_name = nil,
-}
+local M = {}
 
 -- get current context
--- @return string|nil
+---@return string|nil
 M.get_current = function()
     local parser, tree = kube_config._load_config()
 
@@ -81,10 +78,6 @@ M.list = function()
     end
 
     return contexts
-end
-
-M.setup = function(_config)
-    M.current_name = M.get_current()
 end
 
 return M

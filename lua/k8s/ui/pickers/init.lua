@@ -14,7 +14,7 @@ local detail = require("k8s.ui.pickers.detail")
 ---@field ordinal string
 
 ---@class ResourcesPicker
----@field private resources NamespacedResource
+---@field private resources Resource
 ---@field private result table
 ---@field public picker Picker
 local ResourcesPicker = {}
@@ -58,14 +58,10 @@ function ResourcesPicker:preview_opts_factory()
     }
 end
 
----@param resources NamespacedResource
+---@param resources Resource
 ---@param when_select function|nil
 ---@param is_current function|nil
 function ResourcesPicker:new(resources, when_select, is_current)
-    vim.validate({
-        resources = { resources, "table" },
-    })
-
     self.resources = resources
     self.results = self.resources:list_iter():tolist()
 

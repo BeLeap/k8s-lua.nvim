@@ -1,6 +1,6 @@
 local Job = require("plenary.job")
 local uv = require("luv")
-local resources_context = require("k8s.resources.context")
+local global_contexts = require("k8s.global_contexts")
 
 -- @field started boolean
 -- @field _handle Job|nil
@@ -14,7 +14,7 @@ local M = {
 }
 
 M.start = function()
-    M.running_context = resources_context.current_name
+    M.running_context = global_contexts.selected_contexts
 
     M._handle = Job:new({
         command = "kubectl",
@@ -33,7 +33,7 @@ M.start = function()
 end
 
 M.update = function()
-    if M.started == true and M.running_context == resources_context.current_name then
+    if M.started == true and M.running_context == global_contexts.selected_contexts then
         return
     end
 

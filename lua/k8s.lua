@@ -1,7 +1,7 @@
 local api = require("k8s.api")
 local commands = require("k8s.commands")
 local kube_config = require("k8s.kube_config")
-local resources = require("k8s.resources")
+local global_contexts = require("k8s.global_contexts")
 
 local M = {}
 
@@ -17,7 +17,7 @@ M.setup = function(user_config)
     api.setup(M.config)
     commands.setup(M.config)
     kube_config.setup(M.config)
-    resources.setup(M.config)
+    global_contexts.setup(M.config)
 end
 
 return M
