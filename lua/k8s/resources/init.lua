@@ -26,7 +26,7 @@ function Resource:new(kind, api_version, is_namespaced, namespace)
     self.is_namespaced = is_namespaced
     self.namespace = namespace
 
-    local api_prefix = "/api/" .. self.api_version
+    local api_prefix = "/" .. self.api_version
     if self.is_namespaced then
         api_prefix = api_prefix .. "/namespaces/" .. self.namespace
     end

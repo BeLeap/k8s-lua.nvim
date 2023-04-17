@@ -5,7 +5,7 @@ local resources = require("k8s.resources")
 local M = {}
 
 M.select = function()
-    local namespace = resources:new("namespaces", "v1", false, nil)
+    local namespace = resources:new("namespaces", "api/v1", false, nil)
     local Picker = pickers:new(namespace, function(selection)
         global_contexts.selected_namepace = selection.value.metadata.name
     end, function(entry)

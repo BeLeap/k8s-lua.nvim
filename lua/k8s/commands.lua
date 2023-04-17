@@ -1,6 +1,7 @@
 local ui_context = require("k8s.ui.context")
 local ui_namespace = require("k8s.ui.namespace")
 local ui_pod = require("k8s.ui.pod")
+local ui_deployment = require("k8s.ui.deployment")
 
 local M = {
     commands = {
@@ -25,6 +26,13 @@ local M = {
             opts = {},
             command = function()
                 ui_pod.select()
+            end,
+        },
+        {
+            name = "K8sDeploymentList",
+            opts = {},
+            command = function()
+                ui_deployment.select()
             end,
         },
     },
