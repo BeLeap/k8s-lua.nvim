@@ -22,6 +22,11 @@ local M = {
                 end,
             },
             command = function(opts)
+                if opts.args == "" then
+                    print("k8s-lua.nvim: argument required!")
+                    return
+                end
+
                 local ui = require("k8s.ui." .. opts.args)
                 ui.select()
             end,
