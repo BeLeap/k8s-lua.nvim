@@ -1,9 +1,13 @@
 local M = {}
 
+---@param target_path string
+---@return string
 M.readfile = function(target_path)
     return M.join_to_string(vim.fn.readfile(target_path))
 end
 
+---@param data string[]
+---@return string
 M.join_to_string = function(data)
     local content = {}
 
