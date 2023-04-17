@@ -8,7 +8,7 @@ M.get = function(path)
     vim.validate({
         path = { path, "string" },
     })
-    proxy.check()
+    proxy.update()
 
     local url = "localhost:" .. tostring(proxy.port) .. path
     local res = curl.get(url)
@@ -26,7 +26,7 @@ M.patch = function(path, body)
         path = { path, "string" },
         body = { body, "string" },
     })
-    proxy.check()
+    proxy.update()
 
     local url = "localhost:" .. tostring(proxy.port) .. path
     local res = curl.patch(url, {

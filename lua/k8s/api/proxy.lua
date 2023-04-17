@@ -2,10 +2,11 @@ local Job = require("plenary.job")
 local uv = require("luv")
 local global_contexts = require("k8s.global_contexts")
 
--- @field started boolean
--- @field _handle Job|nil
--- @field port string|nil
--- @field current_context string|nil
+---@class ApiProxy
+---@field started boolean
+---@field _handle Job|nil
+---@field port string|nil
+---@field current_context string|nil
 local M = {
     started = false,
     _handle = nil,
@@ -39,6 +40,10 @@ M.update = function()
 
     M.shutdown()
     M.start()
+
+    vim.wait(1000, function()
+        return M.port ~= nil
+    end, 100)
 end
 
 M.shutdown = function()
@@ -50,14 +55,6 @@ M.shutdown = function()
         M._handle = nil
         M.port = nil
     end
-end
-
-M.check = function()
-    M.update()
-
-    vim.wait(1000, function()
-        return M.port ~= nil
-    end, 100)
 end
 
 M.setup = function(_config)
