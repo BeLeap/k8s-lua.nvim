@@ -21,6 +21,14 @@
 
 ## Contributing
 
+### Format
+
+[stylua](https://github.com/JohnnyMorganz/StyLuahttps://github.com/JohnnyMorganz/StyLua)
+
+```sh
+stylua .
+```
+
 ### Test
 
 ```sh
