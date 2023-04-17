@@ -1,64 +1,53 @@
 local Job = require("plenary.job")
 local uv = require("luv")
-local global_contexts = require("k8s.global_contexts")
 
 ---@class ApiProxy
----@field started boolean
----@field _handle Job|nil
----@field port string|nil
----@field current_context string|nil
-local M = {
+---@field public started boolean
+---@field public port string|nil
+---@field public context string|nil
+---@field private handle Job|nil
+local ApiProxy = {
     started = false,
-    _handle = nil,
+    handle = nil,
     port = nil,
-    running_context = nil,
+    context = nil,
 }
 
-M.start = function()
-    M.running_context = global_contexts.selected_contexts
+---@param context string
+function ApiProxy:new(context)
+    self.context = context
 
-    M._handle = Job:new({
+    return self
+end
+
+function ApiProxy:start()
+    self.handle = Job:new({
         command = "kubectl",
         args = {
-            "--context=" .. M.running_context,
+            "--context=" .. self.context,
             "proxy",
             "--port=0",
         },
         on_stdout = function(_error, data)
             local splitted_data = vim.split(data, ":")
-            M.port = splitted_data[2]
+            self.port = splitted_data[2]
         end,
     })
-    M._handle:start()
-    M.started = true
+    self.handle:start()
+    self.started = true
+
+    vim.api.nvim_create_autocmd("VimLeavePre", { callback = self.shutdown })
 end
 
-M.update = function()
-    if M.started == true and M.running_context == global_contexts.selected_contexts then
-        return
-    end
+function ApiProxy:shutdown()
+    if self.started == true then
+        self.handle:shutdown()
+        uv.kill(self.handle.pid, 3)
 
-    M.shutdown()
-    M.start()
-
-    vim.wait(1000, function()
-        return M.port ~= nil
-    end, 100)
-end
-
-M.shutdown = function()
-    if M.started == true then
-        M._handle:shutdown()
-        uv.kill(M._handle.pid, 3)
-
-        M.started = false
-        M._handle = nil
-        M.port = nil
+        self.started = false
+        self.handle = nil
+        self.port = nil
     end
 end
 
-M.setup = function(_config)
-    vim.api.nvim_create_autocmd("VimLeavePre", { callback = M.shutdown })
-end
-
-return M
+return ApiProxy

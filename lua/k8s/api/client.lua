@@ -1,16 +1,41 @@
 local curl = require("plenary.curl")
-local proxy = require("k8s.api.proxy")
+local api_proxy = require("k8s.api.proxy")
+local global_contexts = require("k8s.global_contexts")
 
-local M = {}
+---@class Client
+---@field private proxy ApiProxy|nil
+---@field private update_proxy fun(): nil
+local M = {
+    proxy = nil,
+}
 
--- @return table|nil
+M.update_proxy = function()
+    if M.proxy ~= nil then
+        if M.proxy.started == true and M.proxy.context == global_contexts.selected_contexts then
+            return
+        else
+            M.proxy:shutdown()
+        end
+    end
+
+    local new_api_proxy = api_proxy:new(global_contexts.selected_contexts)
+    new_api_proxy:start()
+
+    vim.wait(10000, function()
+        return new_api_proxy.port ~= nil
+    end, 100)
+
+    M.proxy = new_api_proxy
+end
+
+---@return table|nil
 M.get = function(path)
     vim.validate({
         path = { path, "string" },
     })
-    proxy.update()
+    M.update_proxy()
 
-    local url = "localhost:" .. tostring(proxy.port) .. path
+    local url = "localhost:" .. tostring(M.proxy.port) .. path
     local res = curl.get(url)
 
     local data = nil
@@ -21,14 +46,15 @@ M.get = function(path)
     return data
 end
 
+---@return table|nil
 M.patch = function(path, body)
     vim.validate({
         path = { path, "string" },
         body = { body, "string" },
     })
-    proxy.update()
+    M.update_proxy()
 
-    local url = "localhost:" .. tostring(proxy.port) .. path
+    local url = "localhost:" .. tostring(api_proxy.port) .. path
     local res = curl.patch(url, {
         headers = {
             ["Content-Type"] = "application/json-patch+json",
