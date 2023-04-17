@@ -14,6 +14,10 @@ M.join_to_string = function(data)
     return table.concat(content, "\n")
 end
 
+---@generic T : any
+---@param list1 T[]
+---@param list2 T[]
+---@return T[]
 M.union = function(list1, list2)
     local result = {}
     local hash = {}
