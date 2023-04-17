@@ -21,16 +21,7 @@
 
 ## Contributing
 
-### Format
+All contributions are welcome.
+Please open a pull request.
 
-Uses [stylua](https://github.com/JohnnyMorganz/StyLuahttps://github.com/JohnnyMorganz/StyLua)
-
-```sh
-stylua .
-```
-
-### Test
-
-```sh
-make
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md)
