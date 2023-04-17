@@ -10,7 +10,7 @@ local M = {
                     local match = {}
                     if arglead ~= nil then
                         for _, resource in ipairs(resources) do
-                            if string.find(resource, "^" .. arglead) then
+                            if vim.startswith(resource, arglead) then
                                 table.insert(match, resource)
                             end
                         end
