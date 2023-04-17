@@ -5,7 +5,20 @@ local M = {
             opts = {
                 nargs = "*",
                 complete = function(arglead, line)
-                    return { "context", "namespace", "pod", "deployment", "statefulset" }
+                    local resources = { "context", "namespace", "pod", "deployment", "statefulset" }
+
+                    local match = {}
+                    if arglead ~= nil then
+                        for _, resource in ipairs(resources) do
+                            if string.find(resource, "^" .. arglead) then
+                                table.insert(match, resource)
+                            end
+                        end
+                    else
+                        match = resources
+                    end
+
+                    return match
                 end,
             },
             command = function(opts)
