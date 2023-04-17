@@ -1,23 +1,20 @@
-local resources_namespace = require("k8s.resources.namespace")
 local pickers = require("k8s.ui.pickers")
+local global_contexts = require("k8s.global_contexts")
+local resources = require("k8s.resources")
 
 local M = {}
 
 M.select = function()
-    local Picker = pickers:new({
-        kind = "namespaces",
-        resources = resources_namespace,
-        when_select = function(selection)
-            resources_namespace.current_name = selection.value.metadata.name
-        end,
-        is_current = function(entry)
-            if entry.metadata.name == resources_namespace.current_name then
-                return true
-            end
+    local namespace = resources:new("namespaces", "v1", false, nil)
+    local Picker = pickers:new(namespace, function(selection)
+        global_contexts.selected_namepace = selection.value.metadata.name
+    end, function(entry)
+        if entry.metadata.name == global_contexts.selected_namepace then
+            return true
+        end
 
-            return false
-        end,
-    })
+        return false
+    end)
 
     Picker.picker:find()
 end
