@@ -27,7 +27,7 @@ function Resource:new(kind, api_version, is_namespaced, namespace)
     self.namespace = namespace
 
     local api_prefix = "/" .. self.api_version
-    if self.is_namespaced then
+    if self.is_namespaced and self.namespace ~= nil then
         api_prefix = api_prefix .. "/namespaces/" .. self.namespace
     end
     api_prefix = api_prefix .. "/" .. self.kind
@@ -58,10 +58,6 @@ end
 function Resource:list_iter()
     local data
     data = client.get(self.api_prefix)
-
-    -- else
-    --     data = client.get("/api/" .. self.api_version .. "/" .. self.kind)
-    -- end
 
     if data ~= nil then
         return iterators.iter(data.items)
