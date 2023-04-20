@@ -6,15 +6,18 @@ local M = {}
 
 M.select = function()
     local namespace = resources:new("namespaces", "api/v1", false, nil)
-    local Picker = pickers:new(namespace, function(selection)
-        global_contexts.selected_namepace = selection.value.metadata.name
-    end, function(entry)
-        if entry.metadata.name == global_contexts.selected_namepace then
-            return true
-        end
+    local Picker = pickers:new(namespace, {
+        when_select = function(selection)
+            global_contexts.selected_namepace = selection.value.metadata.name
+        end,
+        is_current = function(entry)
+            if entry.metadata.name == global_contexts.selected_namepace then
+                return true
+            end
 
-        return false
-    end)
+            return false
+        end,
+    })
 
     Picker.picker:find()
 end

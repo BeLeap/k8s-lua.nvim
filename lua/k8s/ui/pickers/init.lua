@@ -15,7 +15,7 @@ local detail = require("k8s.ui.pickers.detail")
 
 ---@class ResourcesPicker
 ---@field private resources Resource
----@field private result table
+---@field private result KubernetesObject[]
 ---@field public picker Picker
 local ResourcesPicker = {}
 
@@ -59,20 +59,19 @@ function ResourcesPicker:preview_opts_factory()
 end
 
 ---@param resources Resource
----@param when_select function|nil
----@param is_current function|nil
-function ResourcesPicker:new(resources, when_select, is_current)
+---@param args { when_select: function|nil, is_current: function|nil }
+function ResourcesPicker:new(resources, args)
     self.resources = resources
+    ---@type KubernetesObject[]
     self.results = self.resources:list_iter():tolist()
 
-    local guarded_when_select = when_select or function(_selection) end
-    local guarded_is_current = is_current or function(_elem)
+    local when_select = args.when_select or function(_selection) end
+    local is_current = args.is_current or function(_elem)
         return false
     end
-
     local default_selection_index = 0
     for i, elem in ipairs(self.results) do
-        if guarded_is_current(elem) then
+        if is_current(elem) then
             default_selection_index = i
         end
     end
@@ -81,6 +80,7 @@ function ResourcesPicker:new(resources, when_select, is_current)
         prompt_title = self.resources.kind,
         finder = finders.new_table({
             results = self.results,
+            ---@param entry KubernetesObject
             entry_maker = function(entry)
                 ---@type ResourceEntry
                 local resource_entry = {
@@ -102,7 +102,7 @@ function ResourcesPicker:new(resources, when_select, is_current)
 
                 ---@type ResourceEntry
                 local selection = action_state.get_selected_entry()
-                guarded_when_select(selection)
+                when_select(selection)
             end)
 
             return true

@@ -6,7 +6,7 @@ local M = {}
 
 M.select = function()
     local pods = resources:new("pods", "api/v1", true, global_contexts.selected_namepace)
-    local Picker = pickers:new(pods)
+    local Picker = pickers:new(pods, {})
     Picker.picker:find()
 end
 

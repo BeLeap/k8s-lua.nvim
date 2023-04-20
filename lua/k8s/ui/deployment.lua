@@ -6,7 +6,7 @@ local M = {}
 
 M.select = function()
     local deployments = resources:new("deployments", "apis/apps/v1", true, global_contexts.selected_namepace)
-    local Picker = pickers:new(deployments)
+    local Picker = pickers:new(deployments, {})
     Picker.picker:find()
 end
 
