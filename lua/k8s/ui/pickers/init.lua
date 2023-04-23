@@ -8,29 +8,27 @@ local utils = require("k8s.utils")
 ---@class ResourcesPicker
 ---@field private resources Resource
 ---@field public buffer BufferHandle
-local ResourcesPicker = {}
+local M = {}
 
 ---@param resources Resource
----@param args { on_select: fun(selection: string): nil|nil }
-function ResourcesPicker:new(resources, args)
-    self.resources = resources
+---@param args { on_select: fun(selection: string): nil|nil, is_current: fun(name: string): boolean | nil }
+function M.new(resources, args)
+    local objects = resources:list()
 
-    local iter = self.resources:list_iter()
+    if objects ~= nil then
+        local names = {}
+        for _, object in ipairs(objects) do
+            table.insert(names, object.metadata.name)
+        end
 
-    if iter ~= nil then
-        local names = iter:map(
-            ---@param elem KubernetesObject
-            function(elem)
-                return elem.metadata.name
-            end
-        ):tolist()
+        local buffer = vim.api.nvim_create_buf(true, true)
+        vim.api.nvim_buf_set_name(buffer, "k8s://" .. resources.kind)
+        vim.api.nvim_buf_set_lines(buffer, 0, -1, false, names)
 
-        self.buffer = vim.api.nvim_create_buf(true, true)
-        vim.api.nvim_buf_set_name(self.buffer, "k8s://" .. self.resources.kind)
-        vim.api.nvim_buf_set_lines(self.buffer, 0, -1, false, names)
+        vim.api.nvim_buf_set_option(buffer, "buftype", "")
+        vim.api.nvim_buf_set_option(buffer, "modifiable", false)
 
-        vim.api.nvim_buf_set_option(self.buffer, "buftype", "")
-        vim.api.nvim_buf_set_option(self.buffer, "modifiable", false)
+        local namespace = vim.api.nvim_create_namespace("kubernetes")
 
         ---set keymap for picker buffer
         ---@param mode string
@@ -45,27 +43,27 @@ function ResourcesPicker:new(resources, args)
 
         local_keymap("n", "e", function()
             local on = utils.line_under_cursor()
-            local object = self.resources:get(on)
+            local object = resources:get(on)
 
             if object ~= nil then
-                local buffer = vim.api.nvim_create_buf(true, true)
-                vim.api.nvim_buf_set_name(buffer, "k8s://" .. self.resources.kind .. "/" .. on)
-                vim.api.nvim_buf_set_option(buffer, "buftype", "")
-                vim.api.nvim_buf_set_option(buffer, "ft", "lua")
-                vim.api.nvim_buf_set_lines(buffer, 0, -1, false, vim.fn.split(tostring(vim.inspect(object)), "\n"))
+                local edit_buffer = vim.api.nvim_create_buf(true, true)
+                vim.api.nvim_buf_set_name(edit_buffer, "k8s://" .. resources.kind .. "/" .. on)
+                vim.api.nvim_buf_set_option(edit_buffer, "buftype", "")
+                vim.api.nvim_buf_set_option(edit_buffer, "ft", "lua")
+                vim.api.nvim_buf_set_lines(edit_buffer, 0, -1, false, vim.fn.split(tostring(vim.inspect(object)), "\n"))
 
-                vim.api.nvim_buf_attach(buffer, false, {})
-                vim.api.nvim_set_current_buf(buffer)
+                vim.api.nvim_buf_attach(edit_buffer, false, {})
+                vim.api.nvim_set_current_buf(edit_buffer)
 
                 vim.api.nvim_create_autocmd({ "BufWriteCmd" }, {
-                    buffer = buffer,
+                    buffer = edit_buffer,
                     callback = function(ev)
                         local content_raw = utils.join_to_string(vim.api.nvim_buf_get_lines(ev.buf, 0, -1, false))
                         local content = load("return " .. content_raw)()
                         local diff = utils.calculate_diffs(object, content)
 
                         self.resources:patch(object.metadata, vim.json.encode(diff))
-                        vim.api.nvim_buf_delete(buffer, { force = true })
+                        vim.api.nvim_buf_delete(edit_buffer, { force = true })
                     end,
                 })
             else
@@ -78,17 +76,15 @@ function ResourcesPicker:new(resources, args)
                 local on = utils.line_under_cursor()
                 args.on_select(on)
 
-                vim.api.nvim_buf_delete(self.buffer, { force = true })
+                vim.api.nvim_buf_delete(buffer, { force = true })
             end, {})
         end
+
+        vim.api.nvim_buf_attach(buffer, false, {})
+        vim.api.nvim_set_current_buf(buffer)
     else
         print("got nil")
     end
-
-    vim.api.nvim_buf_attach(self.buffer, false, {})
-    vim.api.nvim_set_current_buf(self.buffer)
-
-    return self
 end
 
-return ResourcesPicker
+return M

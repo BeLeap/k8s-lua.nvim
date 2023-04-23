@@ -54,13 +54,13 @@ function Resource:patch(metadata, body)
     return client.patch(self.api_prefix .. "/" .. name, body)
 end
 
----@return Iterator|nil
-function Resource:list_iter()
+---@return KubernetesObject[]
+function Resource:list()
     local data
     data = client.get(self.api_prefix)
 
     if data ~= nil then
-        return iterators.iter(data.items)
+        return data.items
     end
 end
 
