@@ -51,8 +51,8 @@ function M.new(resources, args)
                     vim.fn.split(tostring(vim.inspect(object)), "\n")
                 )
 
-                EditBuffer:vim_api("nvim_buf_attach", false, {})
                 EditBuffer:vim_api("nvim_set_current_buf")
+                Buffer:vim_api("nvim_buf_delete", { force = true })
 
                 vim.api.nvim_create_autocmd({ "BufWriteCmd" }, {
                     buffer = EditBuffer.buffer,
@@ -83,7 +83,6 @@ function M.new(resources, args)
             end
         end, {})
 
-        Buffer:vim_api("nvim_buf_attach", false, {})
         Buffer:vim_api("nvim_set_current_buf")
     else
         print("Empty list resource request: " .. resources.kind)
