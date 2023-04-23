@@ -54,7 +54,7 @@ function Resource:patch(metadata, body)
     return client.patch(self.api_prefix .. "/" .. name, body)
 end
 
----@return KubernetesObject[]
+---@return KubernetesObject[]|nil
 function Resource:list()
     local data
     data = client.get(self.api_prefix)
