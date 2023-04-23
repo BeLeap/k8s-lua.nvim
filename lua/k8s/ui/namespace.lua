@@ -6,9 +6,12 @@ local M = {}
 
 M.select = function()
     local namespace = resources:new("namespaces", "api/v1", false, nil)
-    pickers:new(namespace, {
+    pickers.new(namespace, {
         on_select = function(selection)
             global_contexts.selected_namepace = selection
+        end,
+        is_current = function(name)
+            return name == global_contexts.selected_namepace
         end,
     })
 end

@@ -11,24 +11,30 @@ local utils = require("k8s.utils")
 local M = {}
 
 ---@param resources Resource
----@param args { on_select: fun(selection: string): nil|nil, is_current: fun(name: string): boolean | nil }
+---@param args { on_select: fun(selection: string)|nil, is_current: fun(name: string): boolean | nil }
 function M.new(resources, args)
     local objects = resources:list()
 
     if objects ~= nil then
-        local names = {}
-        for _, object in ipairs(objects) do
-            table.insert(names, object.metadata.name)
-        end
-
         local buffer = vim.api.nvim_create_buf(true, true)
-        vim.api.nvim_buf_set_name(buffer, "k8s://" .. resources.kind)
-        vim.api.nvim_buf_set_lines(buffer, 0, -1, false, names)
-
         vim.api.nvim_buf_set_option(buffer, "buftype", "")
-        vim.api.nvim_buf_set_option(buffer, "modifiable", false)
+        vim.api.nvim_buf_set_name(buffer, "k8s://" .. resources.kind)
 
         local namespace = vim.api.nvim_create_namespace("kubernetes")
+
+        for index, object in ipairs(objects) do
+            vim.api.nvim_buf_set_lines(buffer, index - 1, index, false, { object.metadata.name })
+
+            if args.is_current ~= nil and args.is_current(object.metadata.name) then
+                vim.api.nvim_buf_set_extmark(buffer, namespace, index - 1, -1, {
+                    virt_text = {
+                        { "current", "Comment" },
+                    },
+                })
+            end
+        end
+
+        vim.api.nvim_buf_set_option(buffer, "modifiable", false)
 
         ---set keymap for picker buffer
         ---@param mode string
@@ -36,7 +42,7 @@ function M.new(resources, args)
         ---@param action function
         ---@param opts {}
         local local_keymap = function(mode, key, action, opts)
-            local opts_with_buf = vim.tbl_deep_extend("keep", opts, { buffer = self.buffer })
+            local opts_with_buf = vim.tbl_deep_extend("keep", opts, { buffer = buffer })
 
             vim.keymap.set(mode, key, action, opts_with_buf)
         end
