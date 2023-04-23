@@ -45,9 +45,7 @@ function KubernetesResources:patch(metadata, body)
     })
 
     local name = metadata.name
-    local namespace = metadata.namespace
     vim.validate({
-        namespace = { namespace, "string" },
         name = { name, "string" },
     })
 

@@ -9,10 +9,10 @@ M.select = function()
     pickers.new(resources_context, {
         editable = false,
         on_select = function(selection)
-            global_contexts.selected_contexts = selection
+            global_contexts.selected_contexts = selection.name
         end,
-        is_current = function(name)
-            return name == global_contexts.selected_contexts
+        is_current = function(metadata)
+            return metadata.name == global_contexts.selected_contexts
         end,
     })
 end

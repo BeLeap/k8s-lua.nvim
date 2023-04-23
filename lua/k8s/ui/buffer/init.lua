@@ -13,7 +13,14 @@ function Buffer:new()
     return o
 end
 
----@param func_name string
+---@param func_name
+---| "nvim_buf_attach"
+---| "nvim_buf_delete"
+---| "nvim_buf_set_extmark"
+---| "nvim_buf_set_lines"
+---| "nvim_buf_set_name"
+---| "nvim_buf_set_option"
+---| "nvim_set_current_buf"
 ---@param ...any
 function Buffer:vim_api(func_name, ...)
     return vim.api[func_name](self.buffer, ...)
