@@ -102,8 +102,11 @@ describe("contexts", function()
             local mock_utils = mock(utils, true)
             mock_utils.readfile.returns(mock_kubeconfig)
 
-            local contexts = context.list()
-            assert.are.same({ "minikube-1", "minikube-2" }, contexts)
+            local contexts = context:list()
+            assert.are.same(
+                { { metadata = { name = "minikube-1" } }, { metadata = { name = "minikube-2" } } },
+                contexts
+            )
         end)
     end)
 end)

@@ -1,11 +1,13 @@
 local kube_config = require("k8s.kube_config")
 
----@module 'context'
-local M = {}
+---@class ContextResources: Resources
+local ContextResources = {
+    kind = "contexts",
+}
 
 -- get current context
 ---@return string|nil
-M.get_current = function()
+ContextResources.get_current = function()
     local parser, tree = kube_config.load_config()
 
     local ts_query = [[
@@ -36,7 +38,8 @@ M.get_current = function()
 end
 
 -- get list of contexts
-M.list = function()
+---@return KubernetesObject[]|nil
+function ContextResources:list()
     local parser, tree = kube_config.load_config()
 
     local ts_query = [[
@@ -69,16 +72,38 @@ M.list = function()
 
     local query = vim.treesitter.query.parse("yaml", ts_query)
 
+    ---@type KubernetesObject[]
     local contexts = {}
     for id, node, _ in query:iter_captures(tree[1]:root(), parser:source(), 0, -1) do
         local name = query.captures[id]
 
         if name == "value" then
-            vim.list_extend(contexts, { vim.treesitter.get_node_text(node, parser:source()) })
+            table.insert(contexts, {
+                metadata = {
+                    name = vim.treesitter.get_node_text(node, parser:source()),
+                },
+            })
         end
     end
 
     return contexts
 end
 
-return M
+---get
+---@param name string
+---@return KubernetesObject|nil
+function ContextResources:get(name)
+    return nil
+end
+
+---patch
+---@param metadata KubernetesObjectMeta
+---@param body string
+---@return KubernetesObject|nil
+function ContextResources:patch(metadata, body)
+    print("Unpatchable Resource: " .. self.kind)
+
+    return nil
+end
+
+return ContextResources

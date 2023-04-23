@@ -1,12 +1,4 @@
-local pickers = require("telescope.pickers")
-local finders = require("telescope.finders")
-local previewers = require("telescope.previewers")
-local conf = require("telescope.config").values
-local action_state = require("telescope.actions.state")
-local actions = require("telescope.actions")
-
 local utils = require("k8s.utils")
-local detail = require("k8s.ui.pickers.detail")
 
 ---@class ResourceEntry
 ---@field value KubernetesObject
@@ -14,103 +6,103 @@ local detail = require("k8s.ui.pickers.detail")
 ---@field ordinal string
 
 ---@class ResourcesPicker
----@field private resources Resource
----@field private result KubernetesObject[]
----@field public picker Picker
-local ResourcesPicker = {}
+---@field private resources Resources
+---@field public buffer BufferHandle
+local M = {}
 
-function ResourcesPicker:edit_action(prompt_bufnr)
-    return function()
-        ---@type ResourceEntry
-        local selection = action_state.get_selected_entry()
+---@param resources Resources
+---@param args { on_select: (fun(selection: string) | nil), is_current: ((fun(name: string): boolean) | nil), editable: (boolean | nil) }
+function M.new(resources, args)
+    local objects = resources:list()
 
-        local buffer = detail.create(self.resources.kind, selection.value, function(ev)
-            if self.resources.patch ~= nil then
-                local content_raw = utils.join_to_string(vim.api.nvim_buf_get_lines(ev.buf, 0, -1, false))
-                local content = load("return " .. content_raw)()
-                local diff = utils.calculate_diffs(selection.value, content)
+    if objects ~= nil then
+        local buffer = vim.api.nvim_create_buf(true, true)
+        vim.api.nvim_buf_set_option(buffer, "buftype", "")
+        vim.api.nvim_buf_set_name(buffer, "k8s://" .. resources.kind)
 
-                self.resources:patch(selection.value.metadata, vim.json.encode(diff))
+        local namespace = vim.api.nvim_create_namespace("kubernetes")
+
+        for index, object in ipairs(objects) do
+            vim.api.nvim_buf_set_lines(buffer, index - 1, index, false, { object.metadata.name })
+
+            if args.is_current ~= nil and args.is_current(object.metadata.name) then
+                vim.api.nvim_buf_set_extmark(buffer, namespace, index - 1, -1, {
+                    virt_text = {
+                        { "current", "Comment" },
+                    },
+                })
             end
-        end)
-
-        actions.close(prompt_bufnr)
-        vim.api.nvim_set_current_buf(buffer)
-    end
-end
-
-function ResourcesPicker:preview_opts_factory()
-    return {
-        title = "detail",
-        dyn_title = function(_, entry)
-            return "detail - " .. entry.display
-        end,
-        define_preview = function(preview, entry, _status)
-            vim.api.nvim_buf_set_option(preview.state.bufnr, "ft", "lua")
-            vim.api.nvim_buf_set_lines(
-                preview.state.bufnr,
-                0,
-                -1,
-                false,
-                vim.fn.split(tostring(vim.inspect(entry.value)), "\n")
-            )
-        end,
-    }
-end
-
----@param resources Resource
----@param args { when_select: function|nil, is_current: function|nil }
-function ResourcesPicker:new(resources, args)
-    self.resources = resources
-    ---@type KubernetesObject[]
-    self.results = self.resources:list_iter():tolist()
-
-    local when_select = args.when_select or function(_selection) end
-    local is_current = args.is_current or function(_elem)
-        return false
-    end
-    local default_selection_index = 0
-    for i, elem in ipairs(self.results) do
-        if is_current(elem) then
-            default_selection_index = i
         end
+
+        vim.api.nvim_buf_set_option(buffer, "modifiable", false)
+
+        ---set keymap for picker buffer
+        ---@param mode string
+        ---@param key string
+        ---@param action function
+        ---@param opts {}
+        local local_keymap = function(mode, key, action, opts)
+            local opts_with_buf = vim.tbl_deep_extend("keep", opts, { buffer = buffer })
+
+            vim.keymap.set(mode, key, action, opts_with_buf)
+        end
+
+        local_keymap("n", "e", function()
+            if args.editable ~= false then
+                local on = utils.line_under_cursor()
+                local object = resources:get(on)
+
+                if object ~= nil then
+                    local edit_buffer = vim.api.nvim_create_buf(true, true)
+                    vim.api.nvim_buf_set_name(edit_buffer, "k8s://" .. resources.kind .. "/" .. on)
+                    vim.api.nvim_buf_set_option(edit_buffer, "buftype", "")
+                    vim.api.nvim_buf_set_option(edit_buffer, "ft", "lua")
+                    vim.api.nvim_buf_set_lines(
+                        edit_buffer,
+                        0,
+                        -1,
+                        false,
+                        vim.fn.split(tostring(vim.inspect(object)), "\n")
+                    )
+
+                    vim.api.nvim_buf_attach(edit_buffer, false, {})
+                    vim.api.nvim_set_current_buf(edit_buffer)
+
+                    vim.api.nvim_create_autocmd({ "BufWriteCmd" }, {
+                        buffer = edit_buffer,
+                        callback = function(ev)
+                            local content_raw = utils.join_to_string(vim.api.nvim_buf_get_lines(ev.buf, 0, -1, false))
+                            local content = load("return " .. content_raw)()
+                            local diff = utils.calculate_diffs(object, content)
+
+                            resources:patch(object.metadata, vim.json.encode(diff))
+                            vim.api.nvim_buf_delete(edit_buffer, { force = true })
+                        end,
+                    })
+                else
+                    print("Empty get resource request: " .. resources.kind .. "/" .. on)
+                end
+            else
+                print("Uneditable Resource: " .. resources.kind)
+            end
+        end, {})
+
+        local_keymap("n", "s", function()
+            if args.on_select ~= nil then
+                local on = utils.line_under_cursor()
+                args.on_select(on)
+
+                vim.api.nvim_buf_delete(buffer, { force = true })
+            else
+                print("Unselectable Resource: " .. resources.kind)
+            end
+        end, {})
+
+        vim.api.nvim_buf_attach(buffer, false, {})
+        vim.api.nvim_set_current_buf(buffer)
+    else
+        print("Empty list resource request: " .. resources.kind)
     end
-
-    self.picker = pickers.new({}, {
-        prompt_title = self.resources.kind,
-        finder = finders.new_table({
-            results = self.results,
-            ---@param entry KubernetesObject
-            entry_maker = function(entry)
-                ---@type ResourceEntry
-                local resource_entry = {
-                    value = entry,
-                    display = entry.metadata.name,
-                    ordinal = entry.metadata.name,
-                }
-
-                return resource_entry
-            end,
-        }),
-        default_selection_index = default_selection_index,
-        sorter = conf.generic_sorter(),
-        attach_mappings = function(prompt_bufnr, map)
-            map("n", "e", self:edit_action(prompt_bufnr))
-
-            actions.select_default:replace(function()
-                actions.close(prompt_bufnr)
-
-                ---@type ResourceEntry
-                local selection = action_state.get_selected_entry()
-                when_select(selection)
-            end)
-
-            return true
-        end,
-        previewer = previewers.new_buffer_previewer(self:preview_opts_factory()),
-    })
-
-    return self
 end
 
-return ResourcesPicker
+return M

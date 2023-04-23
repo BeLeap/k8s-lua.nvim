@@ -6,8 +6,7 @@ local M = {}
 
 M.select = function()
     local statefulsets = resources:new("statefulsets", "apis/apps/v1", true, global_contexts.selected_namepace)
-    local Picker = pickers:new(statefulsets, {})
-    Picker.picker:find()
+    pickers.new(statefulsets, {})
 end
 
 return M
