@@ -1,47 +1,19 @@
-local pickers = require("telescope.pickers")
-local finders = require("telescope.finders")
-local conf = require("telescope.config").values
-local actions = require("telescope.actions")
-local action_state = require("telescope.actions.state")
-
 local global_contexts = require("k8s.global_contexts")
 local resources_context = require("k8s.resources.context")
+local pickers = require("k8s.ui.pickers")
 
 local M = {}
 
 -- select context with telescope picker
 M.select = function()
-    local contexts = resources_context.list()
-
-    pickers
-        .new({}, {
-            prompt_title = "Contexts",
-            finder = finders.new_table({
-                results = contexts,
-                entry_maker = function(context)
-                    local display = "  " .. context
-                    if context == global_contexts.selected_contexts then
-                        display = "* " .. context
-                    end
-
-                    return {
-                        value = context,
-                        display = display,
-                        ordinal = context,
-                    }
-                end,
-            }),
-            sorter = conf.generic_sorter(),
-            attach_mappings = function(prompt_bufnr, _map)
-                actions.select_default:replace(function()
-                    actions.close(prompt_bufnr)
-                    local selection = action_state.get_selected_entry()
-                    global_contexts.selected_contexts = selection.value
-                end)
-                return true
-            end,
-        })
-        :find()
+    pickers.new(resources_context, {
+        on_select = function(selection)
+            global_contexts.selected_contexts = selection
+        end,
+        is_current = function(name)
+            return name == global_contexts.selected_contexts
+        end,
+    })
 end
 
 return M

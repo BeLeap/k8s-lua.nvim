@@ -1,19 +1,16 @@
-local iterators = require("plenary.iterators")
-
 local client = require("k8s.api.client")
 
----@class Resource
----@field public kind string
+---@class KubernetesResources: Resources
 ---@field public api_version string
 ---@field public is_namespaced boolean
 ---@field private api_prefix string
-local Resource = {}
+local KubernetesResources = {}
 
 ---@param kind string
 ---@param api_version string
 ---@param is_namespaced boolean
 ---@param namespace string|nil
-function Resource:new(kind, api_version, is_namespaced, namespace)
+function KubernetesResources:new(kind, api_version, is_namespaced, namespace)
     vim.validate({
         kind = { kind, "string" },
         api_version = { api_version, "string" },
@@ -38,7 +35,7 @@ end
 
 ---@param metadata KubernetesObjectMeta
 ---@param body string
-function Resource:patch(metadata, body)
+function KubernetesResources:patch(metadata, body)
     vim.validate({
         target = { metadata, "table" },
         body = { body, "string" },
@@ -55,7 +52,7 @@ function Resource:patch(metadata, body)
 end
 
 ---@return KubernetesObject[]|nil
-function Resource:list()
+function KubernetesResources:list()
     local data
     data = client.get(self.api_prefix)
 
@@ -66,9 +63,9 @@ end
 
 ---@param name string
 ---@return KubernetesObject|nil
-function Resource:get(name)
+function KubernetesResources:get(name)
     print(self.api_prefix .. "/" .. name)
     return client.get(self.api_prefix .. "/" .. name)
 end
 
-return Resource
+return KubernetesResources

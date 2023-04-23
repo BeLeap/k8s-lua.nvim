@@ -10,7 +10,7 @@ local utils = require("k8s.utils")
 ---@field public buffer BufferHandle
 local M = {}
 
----@param resources Resource
+---@param resources KubernetesResources
 ---@param args { on_select: fun(selection: string)|nil, is_current: fun(name: string): boolean | nil }
 function M.new(resources, args)
     local objects = resources:list()
