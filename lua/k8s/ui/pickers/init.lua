@@ -63,12 +63,14 @@ function M.new(resources, args)
 
                         resources:patch(object.metadata, vim.json.encode(diff))
                         EditBuffer:vim_api("nvim_buf_delete", { force = true })
+
+                        M.new(resources, args)
                     end,
                 })
             else
                 print("Uneditable Resource: " .. resources.kind)
             end
-        end, {})
+        end)
 
         Buffer:keymap("n", "s", function()
             if args.on_select ~= nil then
@@ -81,7 +83,11 @@ function M.new(resources, args)
             else
                 print("Unselectable Resource: " .. resources.kind)
             end
-        end, {})
+        end)
+
+        Buffer:keymap("n", "q", function()
+            Buffer:vim_api("nvim_buf_delete", { force = true })
+        end)
 
         Buffer:vim_api("nvim_set_current_buf")
     else
