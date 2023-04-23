@@ -7,6 +7,6 @@
 
 ---@class Resources
 ---@field public kind string
----@field public get fun(self: Resources, name: string): KubernetesObject
----@field public list fun(self: Resources): KubernetesObject[]
----@field public patch fun(self: Resources, target: KubernetesObjectMeta, data: string): KubernetesObject
+---@field public get fun(self: Resources, name: string): KubernetesObject|nil
+---@field public list fun(self: Resources): KubernetesObject[]|nil
+---@field public patch fun(self: Resources, target: KubernetesObjectMeta, data: string): KubernetesObject|nil

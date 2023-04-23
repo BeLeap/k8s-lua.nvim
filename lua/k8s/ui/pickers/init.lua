@@ -10,8 +10,8 @@ local utils = require("k8s.utils")
 ---@field public buffer BufferHandle
 local M = {}
 
----@param resources KubernetesResources
----@param args { on_select: fun(selection: string)|nil, is_current: fun(name: string): boolean | nil }
+---@param resources Resources
+---@param args { on_select: (fun(selection: string) | nil), is_current: ((fun(name: string): boolean) | nil), editable: (boolean | nil) }
 function M.new(resources, args)
     local objects = resources:list()
 
@@ -48,43 +48,55 @@ function M.new(resources, args)
         end
 
         local_keymap("n", "e", function()
-            local on = utils.line_under_cursor()
-            local object = resources:get(on)
+            if args.editable ~= false then
+                local on = utils.line_under_cursor()
+                local object = resources:get(on)
 
-            if object ~= nil then
-                local edit_buffer = vim.api.nvim_create_buf(true, true)
-                vim.api.nvim_buf_set_name(edit_buffer, "k8s://" .. resources.kind .. "/" .. on)
-                vim.api.nvim_buf_set_option(edit_buffer, "buftype", "")
-                vim.api.nvim_buf_set_option(edit_buffer, "ft", "lua")
-                vim.api.nvim_buf_set_lines(edit_buffer, 0, -1, false, vim.fn.split(tostring(vim.inspect(object)), "\n"))
+                if object ~= nil then
+                    local edit_buffer = vim.api.nvim_create_buf(true, true)
+                    vim.api.nvim_buf_set_name(edit_buffer, "k8s://" .. resources.kind .. "/" .. on)
+                    vim.api.nvim_buf_set_option(edit_buffer, "buftype", "")
+                    vim.api.nvim_buf_set_option(edit_buffer, "ft", "lua")
+                    vim.api.nvim_buf_set_lines(
+                        edit_buffer,
+                        0,
+                        -1,
+                        false,
+                        vim.fn.split(tostring(vim.inspect(object)), "\n")
+                    )
 
-                vim.api.nvim_buf_attach(edit_buffer, false, {})
-                vim.api.nvim_set_current_buf(edit_buffer)
+                    vim.api.nvim_buf_attach(edit_buffer, false, {})
+                    vim.api.nvim_set_current_buf(edit_buffer)
 
-                vim.api.nvim_create_autocmd({ "BufWriteCmd" }, {
-                    buffer = edit_buffer,
-                    callback = function(ev)
-                        local content_raw = utils.join_to_string(vim.api.nvim_buf_get_lines(ev.buf, 0, -1, false))
-                        local content = load("return " .. content_raw)()
-                        local diff = utils.calculate_diffs(object, content)
+                    vim.api.nvim_create_autocmd({ "BufWriteCmd" }, {
+                        buffer = edit_buffer,
+                        callback = function(ev)
+                            local content_raw = utils.join_to_string(vim.api.nvim_buf_get_lines(ev.buf, 0, -1, false))
+                            local content = load("return " .. content_raw)()
+                            local diff = utils.calculate_diffs(object, content)
 
-                        resources:patch(object.metadata, vim.json.encode(diff))
-                        vim.api.nvim_buf_delete(edit_buffer, { force = true })
-                    end,
-                })
+                            resources:patch(object.metadata, vim.json.encode(diff))
+                            vim.api.nvim_buf_delete(edit_buffer, { force = true })
+                        end,
+                    })
+                else
+                    print("got nil")
+                end
             else
-                print("got nil")
+                print("Uneditable Resource: " .. resources.kind)
             end
         end, {})
 
-        if args.on_select ~= nil then
-            local_keymap("n", "s", function()
+        local_keymap("n", "s", function()
+            if args.on_select ~= nil then
                 local on = utils.line_under_cursor()
                 args.on_select(on)
 
                 vim.api.nvim_buf_delete(buffer, { force = true })
-            end, {})
-        end
+            else
+                print("Unselectable Resource: " .. resources.kind)
+            end
+        end, {})
 
         vim.api.nvim_buf_attach(buffer, false, {})
         vim.api.nvim_set_current_buf(buffer)
