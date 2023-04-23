@@ -34,18 +34,7 @@ function M.new(resources, args)
 
         Buffer:vim_api("nvim_buf_set_option", "modifiable", false)
 
-        ---set keymap for picker buffer
-        ---@param mode string
-        ---@param key string
-        ---@param action function
-        ---@param opts {}
-        local local_keymap = function(mode, key, action, opts)
-            local opts_with_buf = vim.tbl_deep_extend("keep", opts, { buffer = Buffer.buffer })
-
-            vim.keymap.set(mode, key, action, opts_with_buf)
-        end
-
-        local_keymap("n", "e", function()
+        Buffer:keymap("n", "e", function()
             if args.editable ~= false then
                 local cursor_location = vim.api.nvim_win_get_cursor(0)
                 local object = objects[cursor_location[1]]
@@ -81,7 +70,7 @@ function M.new(resources, args)
             end
         end, {})
 
-        local_keymap("n", "s", function()
+        Buffer:keymap("n", "s", function()
             if args.on_select ~= nil then
                 local cursor_location = vim.api.nvim_win_get_cursor(0)
                 local object = objects[cursor_location[1]]

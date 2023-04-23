@@ -13,6 +13,20 @@ function Buffer:new()
     return o
 end
 
+---set keymap for picker buffer
+---@param mode
+---| "n"
+---| "i"
+---| "v"
+---@param key string
+---@param action function
+---@param opts {}|nil
+function Buffer:keymap(mode, key, action, opts)
+    local opts_with_buf = vim.tbl_deep_extend("keep", opts or {}, { buffer = Buffer.buffer })
+
+    vim.keymap.set(mode, key, action, opts_with_buf)
+end
+
 ---@param func_name
 ---| "nvim_buf_attach"
 ---| "nvim_buf_delete"
