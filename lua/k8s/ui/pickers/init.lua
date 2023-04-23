@@ -6,7 +6,7 @@ local utils = require("k8s.utils")
 ---@field ordinal string
 
 ---@class ResourcesPicker
----@field private resources Resource
+---@field private resources Resources
 ---@field public buffer BufferHandle
 local M = {}
 
