@@ -64,4 +64,11 @@ function Resource:list_iter()
     end
 end
 
+---@param name string
+---@return KubernetesObject|nil
+function Resource:get(name)
+    print(self.api_prefix .. "/" .. name)
+    return client.get(self.api_prefix .. "/" .. name)
+end
+
 return Resource
