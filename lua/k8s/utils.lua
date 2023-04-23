@@ -94,11 +94,4 @@ M.calculate_diffs = function(original, new)
     return diffs
 end
 
----@return string
-M.line_under_cursor = function()
-    local cursor_location = vim.api.nvim_win_get_cursor(0)
-    local current_buffer = vim.api.nvim_win_get_buf(0)
-    return vim.api.nvim_buf_get_lines(current_buffer, cursor_location[1] - 1, cursor_location[1], false)[1]
-end
-
 return M

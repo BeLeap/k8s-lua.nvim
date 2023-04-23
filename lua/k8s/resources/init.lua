@@ -18,19 +18,22 @@ function KubernetesResources:new(kind, api_version, is_namespaced, namespace)
         namespace = { namespace, { "string", "nil" } },
     })
 
-    self.kind = kind
-    self.api_version = api_version
-    self.is_namespaced = is_namespaced
-    self.namespace = namespace
+    local o = {}
+    o = vim.deepcopy(self)
 
-    local api_prefix = "/" .. self.api_version
-    if self.is_namespaced and self.namespace ~= nil then
-        api_prefix = api_prefix .. "/namespaces/" .. self.namespace
+    o.kind = kind
+    o.api_version = api_version
+    o.is_namespaced = is_namespaced
+    o.namespace = namespace
+
+    local api_prefix = "/" .. o.api_version
+    if o.is_namespaced and o.namespace ~= nil then
+        api_prefix = api_prefix .. "/namespaces/" .. o.namespace
     end
-    api_prefix = api_prefix .. "/" .. self.kind
-    self.api_prefix = api_prefix
+    api_prefix = api_prefix .. "/" .. o.kind
+    o.api_prefix = api_prefix
 
-    return self
+    return o
 end
 
 ---@param metadata KubernetesObjectMeta
