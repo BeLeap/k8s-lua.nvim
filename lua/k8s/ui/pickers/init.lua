@@ -80,7 +80,7 @@ function M.new(resources, args)
                         end,
                     })
                 else
-                    print("got nil")
+                    print("Empty get resource request: " .. resources.kind .. "/" .. on)
                 end
             else
                 print("Uneditable Resource: " .. resources.kind)
@@ -101,7 +101,7 @@ function M.new(resources, args)
         vim.api.nvim_buf_attach(buffer, false, {})
         vim.api.nvim_set_current_buf(buffer)
     else
-        print("got nil")
+        print("Empty list resource request: " .. resources.kind)
     end
 end
 
