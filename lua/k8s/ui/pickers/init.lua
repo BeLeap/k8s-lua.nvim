@@ -6,9 +6,6 @@ local buffer = require("k8s.ui.buffer")
 ---@field display string
 ---@field ordinal string
 
----@class ResourcesPicker
----@field private resources Resources
----@field public buffer BufferHandle
 local M = {}
 
 ---@param resources Resources
