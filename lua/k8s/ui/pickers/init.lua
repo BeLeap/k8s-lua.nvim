@@ -68,7 +68,7 @@ function M.new(resources, args)
                         local content = load("return " .. content_raw)()
                         local diff = utils.calculate_diffs(object, content)
 
-                        self.resources:patch(object.metadata, vim.json.encode(diff))
+                        resources:patch(object.metadata, vim.json.encode(diff))
                         vim.api.nvim_buf_delete(edit_buffer, { force = true })
                     end,
                 })
