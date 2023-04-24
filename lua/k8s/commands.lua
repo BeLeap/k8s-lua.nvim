@@ -1,3 +1,40 @@
+local aliases = {
+    ["context"] = {
+        "ctx",
+        "contexts",
+    },
+    ["namespace"] = {
+        "ns",
+        "namespaces",
+    },
+    ["pod"] = {
+        "po",
+        "pods",
+    },
+    ["deployment"] = {
+        "deploy",
+        "deployments",
+    },
+    ["statefulset"] = {
+        "sts",
+        "statefulsets",
+    },
+    ["service"] = {
+        "svc",
+        "services",
+    },
+}
+
+local lookup_table = {}
+
+local gen_lookup_table = function()
+    for k, alias in pairs(aliases) do
+        for _, v in ipairs(alias) do
+            lookup_table[v] = k
+        end
+    end
+end
+
 local M = {
     commands = {
         {
@@ -27,7 +64,15 @@ local M = {
                     return
                 end
 
-                local ui = require("k8s.ui." .. opts.args)
+                local module_found, ui = pcall(require, "k8s.ui." .. opts.args)
+
+                if not module_found then
+                    if vim.tbl_isempty(lookup_table) then
+                        gen_lookup_table()
+                    end
+
+                    ui = require("k8s.ui." .. lookup_table[opts.args])
+                end
                 ui.select()
             end,
         },
