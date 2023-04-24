@@ -47,6 +47,11 @@ function M.new(resources, args)
                 )
 
                 EditBuffer:vim_api("nvim_set_current_buf")
+
+                EditBuffer:keymap("n", "q", function()
+                    EditBuffer:vim_api("nvim_buf_delete", { force = true })
+                end)
+
                 Buffer:vim_api("nvim_buf_delete", { force = true })
 
                 vim.api.nvim_create_autocmd({ "BufWriteCmd" }, {
