@@ -7,7 +7,7 @@ function Buffer:new()
     local o = {}
     o = vim.deepcopy(self)
 
-    local buffer = vim.api.nvim_create_buf(true, true)
+    local buffer = vim.api.nvim_create_buf(false, true)
     o.buffer = buffer
 
     return o
