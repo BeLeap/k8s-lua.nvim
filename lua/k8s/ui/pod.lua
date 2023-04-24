@@ -10,6 +10,12 @@ M.select = function()
         entry_modifier = function(buffer, index, object)
             local pod = object --[[@as Pod]]
 
+            buffer:vim_api("nvim_buf_set_extmark", global_contexts.ns_id, index - 1, -1, {
+                virt_text = {
+                    { pod.status.phase, "Comment" },
+                },
+            })
+
             local conditions = pod.status.conditions
 
             for _, condition in ipairs(conditions) do
