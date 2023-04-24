@@ -4,7 +4,7 @@ local M = {
             name = "Kube",
             opts = {
                 nargs = "*",
-                complete = function(arglead, line)
+                complete = function(arglead, _line)
                     local resources = { "context", "namespace", "pod", "deployment", "statefulset", "service" }
 
                     local match = {}
