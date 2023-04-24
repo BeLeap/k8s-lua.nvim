@@ -34,7 +34,7 @@ local M = {
     },
 }
 
-M.setup = function(_config)
+M.setup = function()
     for _, command in ipairs(M.commands) do
         local opts = vim.tbl_extend("force", command.opts, { force = true })
         vim.api.nvim_create_user_command(command.name, command.command, opts)

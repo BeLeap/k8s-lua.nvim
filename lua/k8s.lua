@@ -14,9 +14,10 @@ M.config = {
 M.setup = function(user_config)
     M.config = vim.tbl_deep_extend("force", M.config, user_config or {})
 
-    commands.setup(M.config)
     kube_config.setup(M.config)
-    global_contexts.setup(M.config)
+    global_contexts.setup()
+
+    commands.setup()
     highlight.setup()
 end
 
