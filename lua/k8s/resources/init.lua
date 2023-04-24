@@ -10,6 +10,7 @@ local KubernetesResources = {}
 ---@param api_version string
 ---@param is_namespaced boolean
 ---@param namespace string|nil
+---@return KubernetesResources
 function KubernetesResources:new(kind, api_version, is_namespaced, namespace)
     vim.validate({
         kind = { kind, "string" },

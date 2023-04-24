@@ -10,7 +10,7 @@ local global_contexts = require("k8s.global_contexts")
 local M = {}
 
 ---@param resources Resources
----@param args { on_select: (fun(selection: KubernetesObjectMeta) | nil), editable: (boolean | nil), entry_modifier: (fun(buffer: Buffer, index: integer, metadata: KubernetesObjectMeta) | nil) }
+---@param args { on_select: (fun(selection: KubernetesObjectMeta) | nil), editable: (boolean | nil), entry_modifier: (fun(buffer: Buffer, index: integer, object: KubernetesObject) | nil) }
 function M.new(resources, args)
     local objects = resources:list()
 
@@ -23,7 +23,7 @@ function M.new(resources, args)
             Buffer:vim_api("nvim_buf_set_lines", index - 1, index, false, { object.metadata.name })
 
             if args.entry_modifier then
-                args.entry_modifier(Buffer, index, object.metadata)
+                args.entry_modifier(Buffer, index, object)
             end
         end
 
