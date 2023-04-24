@@ -12,7 +12,7 @@
 ---@field public patch fun(self: Resources, target: KubernetesObjectMeta, data: string): KubernetesObject|nil
 
 ---@class Pod: KubernetesObject
----@field kind "status"
+---@field kind "Pod"
 ---@field status PodStatus
 
 ---@class PodStatus
@@ -30,3 +30,11 @@
 ---| "True"
 ---| "False"
 ---| "Unknown"
+
+---@class Deployment: KubernetesObject
+---@field kind "Deployment"
+---@field status DeploymentStatus
+
+---@class DeploymentStatus
+---@field replicas integer
+---@field readyReplicas integer
