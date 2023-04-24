@@ -24,6 +24,18 @@ M.select = function()
                 end
             end
         end,
+        additional_keymaps = {
+            {
+                mode = "n",
+                key = "l",
+                action = function(objects)
+                    return function()
+                        local cursor_location = vim.api.nvim_win_get_cursor(0)
+                        local object = objects[cursor_location[1]]
+                    end
+                end,
+            },
+        },
     })
 end
 

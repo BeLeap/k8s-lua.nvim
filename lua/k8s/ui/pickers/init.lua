@@ -8,8 +8,23 @@ local buffer = require("k8s.ui.buffer")
 
 local M = {}
 
+---@class PickerNewArgs
+---@field on_select (fun(selection: KubernetesObjectMeta) | nil)
+---@field editable (boolean | nil)
+---@field entry_modifier (fun(buffer: Buffer, index: integer, object: KubernetesObject) | nil)
+---@field additional_keymaps (AdditionalKeymap[] | nil)
+
+---@class AdditionalKeymap
+---@field mode
+---| "n"
+---| "i"
+---| "v"
+---@field key string
+---@field action fun(objects: KubernetesObject[]): function
+---@field opts table|nil
+
 ---@param resources Resources
----@param args { on_select: (fun(selection: KubernetesObjectMeta) | nil), editable: (boolean | nil), entry_modifier: (fun(buffer: Buffer, index: integer, object: KubernetesObject) | nil) }
+---@param args PickerNewArgs
 function M.new(resources, args)
     local objects = resources:list()
 
@@ -92,6 +107,12 @@ function M.new(resources, args)
             Buffer:vim_api("nvim_buf_delete", { force = true })
             M.new(resources, args)
         end)
+
+        if args.additional_keymaps ~= nil then
+            for _, v in ipairs(args.additional_keymaps) do
+                Buffer:keymap(v.mode, v.key, v.action, v.opts)
+            end
+        end
 
         Buffer:vim_api("nvim_set_current_buf")
     else
