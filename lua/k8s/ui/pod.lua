@@ -14,7 +14,7 @@ M.select = function()
 
             for _, condition in ipairs(conditions) do
                 if condition.type == "ContainersReady" and condition.status == "False" then
-                    buffer:highlight(global_contexts.ns_id, "ErrorMsg", { index - 1, 0 }, { index - 1, -1 })
+                    buffer:highlight(global_contexts.ns_id, "K8sPodUnhealthy", { index - 1, 0 }, { index - 1, -1 })
                 end
             end
         end,

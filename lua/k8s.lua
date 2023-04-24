@@ -1,6 +1,7 @@
 local commands = require("k8s.commands")
 local kube_config = require("k8s.kube_config")
 local global_contexts = require("k8s.global_contexts")
+local highlight = require("k8s.highlight")
 
 local M = {}
 
@@ -16,6 +17,7 @@ M.setup = function(user_config)
     commands.setup(M.config)
     kube_config.setup(M.config)
     global_contexts.setup(M.config)
+    highlight.setup()
 end
 
 return M
