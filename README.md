@@ -26,6 +26,29 @@ Thank you for your understanding!
 }
 ```
 
+## Available Commands
+
+Given aliases,
+
+```lua
+local aliases = {
+    ["context"] = {
+        "ctx",
+        "contexts",
+    },
+}
+```
+
+Following command works.
+
+```vim
+Kube context
+Kube ctx
+Kube contexts
+```
+
+To see full list of aliases, See [this code](lua/k8s/commands.lua#L1-L26)
+
 ## Contributing
 
 All contributions are welcome.
