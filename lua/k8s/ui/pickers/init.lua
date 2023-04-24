@@ -1,6 +1,5 @@
 local utils = require("k8s.utils")
 local buffer = require("k8s.ui.buffer")
-local global_contexts = require("k8s.global_contexts")
 
 ---@class ResourceEntry
 ---@field value KubernetesObject
