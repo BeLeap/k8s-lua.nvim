@@ -1,1 +1,3 @@
 ---@class BufferHandle
+
+---@class NamespaceId

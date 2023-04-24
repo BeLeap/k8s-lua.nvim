@@ -1,5 +1,6 @@
 local utils = require("k8s.utils")
 local buffer = require("k8s.ui.buffer")
+local global_contexts = require("k8s.global_contexts")
 
 ---@class ResourceEntry
 ---@field value KubernetesObject
@@ -9,7 +10,7 @@ local buffer = require("k8s.ui.buffer")
 local M = {}
 
 ---@param resources Resources
----@param args { on_select: (fun(selection: KubernetesObjectMeta) | nil), is_current: ((fun(metadata: KubernetesObjectMeta): boolean) | nil), editable: (boolean | nil) }
+---@param args { on_select: (fun(selection: KubernetesObjectMeta) | nil), editable: (boolean | nil), entry_modifier: (fun(buffer: Buffer, index: integer, metadata: KubernetesObjectMeta) | nil) }
 function M.new(resources, args)
     local objects = resources:list()
 
@@ -18,17 +19,11 @@ function M.new(resources, args)
         Buffer:vim_api("nvim_buf_set_option", "buftype", "")
         Buffer:vim_api("nvim_buf_set_name", "k8s://" .. resources.kind)
 
-        local namespace = vim.api.nvim_create_namespace("kubernetes")
-
         for index, object in ipairs(objects) do
             Buffer:vim_api("nvim_buf_set_lines", index - 1, index, false, { object.metadata.name })
 
-            if args.is_current ~= nil and args.is_current(object.metadata) then
-                Buffer:vim_api("nvim_buf_set_extmark", namespace, index - 1, -1, {
-                    virt_text = {
-                        { "current", "Comment" },
-                    },
-                })
+            if args.entry_modifier then
+                args.entry_modifier(Buffer, index, object.metadata)
             end
         end
 

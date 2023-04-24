@@ -8,10 +8,16 @@ M.select = function()
     local namespace = resources:new("namespaces", "api/v1", false, nil)
     pickers.new(namespace, {
         on_select = function(selection)
-            global_contexts.selected_namepace = selection.name
+            global_contexts.selected_namespace = selection.name
         end,
-        is_current = function(metadata)
-            return metadata.name == global_contexts.selected_namepace
+        entry_modifier = function(buffer, index, metadata)
+            if metadata.name == global_contexts.selected_namespace then
+                buffer:vim_api("nvim_buf_set_extmark", global_contexts.ns_id, index - 1, -1, {
+                    virt_text = {
+                        { "current", "Comment" },
+                    },
+                })
+            end
         end,
     })
 end

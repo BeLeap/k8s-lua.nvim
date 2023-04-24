@@ -5,7 +5,7 @@ local global_contexts = require("k8s.global_contexts")
 local M = {}
 
 M.select = function()
-    local deployments = resources:new("deployments", "apis/apps/v1", true, global_contexts.selected_namepace)
+    local deployments = resources:new("deployments", "apis/apps/v1", true, global_contexts.selected_namespace)
     pickers.new(deployments, {})
 end
 

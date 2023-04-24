@@ -13,6 +13,15 @@ function Buffer:new()
     return o
 end
 
+---@param ns NamespaceId
+---@param hlgroup string
+---@param start { [1]: integer, [2]: integer }
+---@param finish { [1]: integer, [2]: integer }
+---@param opts table|nil
+function Buffer:highlight(ns, hlgroup, start, finish, opts)
+    vim.highlight.range(self.buffer, ns, hlgroup, start, finish, opts)
+end
+
 ---set keymap for picker buffer
 ---@param mode
 ---| "n"
