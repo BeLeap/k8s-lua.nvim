@@ -84,6 +84,11 @@ function M.new(resources, args)
             Buffer:vim_api("nvim_buf_delete", { force = true })
         end)
 
+        Buffer:keymap("n", "r", function()
+            Buffer:vim_api("nvim_buf_delete", { force = true })
+            M.new(resources, args)
+        end)
+
         Buffer:vim_api("nvim_set_current_buf")
     else
         print("Empty list resource request: " .. resources.kind)
