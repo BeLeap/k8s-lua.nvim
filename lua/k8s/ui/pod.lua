@@ -42,8 +42,14 @@ M.select = function()
                         local logs = pods:get_log(object)
 
                         for k, v in pairs(logs) do
-                            local LogBuffer =
-                                buffer:new("k8s://" .. pods.fqdn .. "/" .. object.metadata.name .. "/log/" .. k)
+                            local LogBuffer = buffer:new(
+                                "k8s://"
+                                    .. pods:build_fqdn(object.metadata.namespace)
+                                    .. "/"
+                                    .. object.metadata.name
+                                    .. "/log/"
+                                    .. k
+                            )
 
                             LogBuffer:vim_api("nvim_buf_set_option", "buftype", "")
                             LogBuffer:vim_api("nvim_buf_set_option", "ft", "log")

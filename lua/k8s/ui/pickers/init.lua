@@ -37,7 +37,7 @@ function ResourcePicker:new(resources, args)
     o.objects = resources:list()
 
     if o.objects ~= nil then
-        o.buffer = buffer:new("k8s://" .. resources.fqdn)
+        o.buffer = buffer:new("k8s://" .. resources:build_fqdn())
         o.buffer:vim_api("nvim_buf_set_option", "modifiable", true)
 
         o.buffer:vim_api("nvim_buf_set_option", "buftype", "")
@@ -56,7 +56,9 @@ function ResourcePicker:new(resources, args)
                 local cursor_location = vim.api.nvim_win_get_cursor(0)
                 local object = o.objects[cursor_location[1]]
 
-                EditBuffer = buffer:new("k8s://" .. resources.fqdn .. "/" .. object.metadata.name)
+                EditBuffer = buffer:new(
+                    "k8s://" .. resources:build_fqdn(object.metadata.namespace) .. "/" .. object.metadata.name
+                )
                 EditBuffer:vim_api("nvim_buf_set_option", "buftype", "")
                 EditBuffer:vim_api("nvim_buf_set_option", "ft", "lua")
                 EditBuffer:vim_api(

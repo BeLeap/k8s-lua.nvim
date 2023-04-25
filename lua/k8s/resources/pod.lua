@@ -22,10 +22,13 @@ function PodResources:get_log(object)
 
     local result = {}
     for _, container in ipairs(containers) do
-        result[container.name] = client.get_raw_body(self.api_prefix .. "/" .. name .. "/" .. "log", {
-            container = container.name,
-            tailLines = tostring(k8s.config.resources.pod.log.max_lines),
-        })
+        result[container.name] = client.get_raw_body(
+            self:build_url(self:build_fqdn(object.metadata.namespace)) .. "/" .. name .. "/" .. "log",
+            {
+                container = container.name,
+                tailLines = tostring(k8s.config.resources.pod.log.max_lines),
+            }
+        )
     end
 
     return result
