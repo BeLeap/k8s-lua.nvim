@@ -5,7 +5,7 @@ local global_contexts = require("k8s.global_contexts")
 local M = {}
 
 M.select = function()
-    local namespace = resources:new("namespaces", "api/v1", false, nil)
+    local namespace = resources:new("namespaces", "api", "v1", false, nil)
 
     pickers:new(namespace, {
         on_select = function(selection)

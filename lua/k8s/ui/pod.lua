@@ -6,7 +6,7 @@ local global_contexts = require("k8s.global_contexts")
 local M = {}
 
 M.select = function()
-    local pods = resources:new("pods", "api/v1", true, global_contexts.selected_namespace)
+    local pods = resources:new("pods", "api", "v1", true, global_contexts.selected_namespace)
 
     pickers:new(pods, {
         entry_modifier = function(picker_buffer, index, object)
@@ -42,15 +42,14 @@ M.select = function()
                         local logs = pods:get_log(object)
 
                         for k, v in pairs(logs) do
-                            local LogBuffer = buffer:new()
-                            local buffer_name = "k8s://" .. pods.kind .. "/logs/" .. k
+                            local LogBuffer =
+                                buffer:new("k8s://" .. pods.fqdn .. "/" .. object.metadata.name .. "/log/" .. k)
 
                             LogBuffer:vim_api("nvim_buf_set_option", "buftype", "")
-                            LogBuffer:vim_api("nvim_buf_set_name", buffer_name)
                             LogBuffer:vim_api("nvim_buf_set_option", "ft", "log")
                             LogBuffer:vim_api("nvim_buf_set_lines", 0, -1, false, vim.fn.split(v, "\n"))
 
-                            vim.cmd.split(buffer_name)
+                            vim.cmd.split(LogBuffer.name)
                         end
 
                         -- picker.buffer:vim_api("nvim_buf_delete", { force = true })

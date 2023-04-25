@@ -2,7 +2,7 @@ local kube_config = require("k8s.kube_config")
 
 ---@class ContextResources: Resources
 local ContextResources = {
-    kind = "contexts",
+    fqdn = "contexts",
 }
 
 -- get current context

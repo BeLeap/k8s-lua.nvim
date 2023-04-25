@@ -1,14 +1,32 @@
 ---@class Buffer
 ---@field public buffer BufferHandle
+---@field public name string
 local Buffer = {}
 
+---@param name string
 ---@return Buffer
-function Buffer:new()
+function Buffer:new(name)
     local o = {}
     o = vim.deepcopy(self)
 
-    local buffer = vim.api.nvim_create_buf(true, true)
+    ---@class BufferInfo
+    ---@field bufnr number
+    ---@field name string
+
+    ---@type BufferInfo[]
+    local existing_buffers = vim.fn.getbufinfo()
+
+    for _, existing_buffer in ipairs(existing_buffers) do
+        if string.find(existing_buffer.name, name) then
+            vim.api.nvim_buf_delete(existing_buffer.bufnr, { force = true })
+        end
+    end
+
+    local buffer = vim.api.nvim_create_buf(false, true)
     o.buffer = buffer
+    o.name = name
+
+    o:vim_api("nvim_buf_set_name", name)
 
     o:keymap("n", "q", function()
         o:vim_api("nvim_buf_delete", { force = true })

@@ -1,38 +1,33 @@
 local client = require("k8s.api.client")
 
 ---@class KubernetesResources: Resources
----@field public api_version string
 ---@field public is_namespaced boolean
----@field protected api_prefix string
+---@field public api_prefix string
 local KubernetesResources = {}
 
 ---@param kind string
----@param api_version string
+---@param api string
+---@param api_group string
 ---@param is_namespaced boolean
 ---@param namespace string|nil
 ---@return KubernetesResources
-function KubernetesResources:new(kind, api_version, is_namespaced, namespace)
-    vim.validate({
-        kind = { kind, "string" },
-        api_version = { api_version, "string" },
-        is_namespaced = { is_namespaced, "boolean" },
-        namespace = { namespace, { "string", "nil" } },
-    })
-
+function KubernetesResources:new(kind, api, api_group, is_namespaced, namespace)
     local o = {}
     o = vim.deepcopy(self)
 
     o.kind = kind
-    o.api_version = api_version
+    o.api_group = api_group
     o.is_namespaced = is_namespaced
     o.namespace = namespace
 
-    local api_prefix = "/" .. o.api_version
+    local fqdn = api_group
     if o.is_namespaced and o.namespace ~= nil then
-        api_prefix = api_prefix .. "/namespaces/" .. o.namespace
+        fqdn = fqdn .. "/namespaces/" .. o.namespace
     end
-    api_prefix = api_prefix .. "/" .. o.kind
-    o.api_prefix = api_prefix
+    fqdn = fqdn .. "/" .. o.kind
+    o.fqdn = fqdn
+
+    o.api_prefix = "/" .. api .. "/" .. fqdn
 
     return o
 end
