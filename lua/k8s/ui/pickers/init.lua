@@ -6,32 +6,55 @@ local buffer = require("k8s.ui.buffer")
 ---@field display string
 ---@field ordinal string
 
-local M = {}
+---@class ResourcePicker
+---@field public resources Resources
+---@field public objects KubernetesObject[]|nil
+---@field public buffer Buffer|nil
+local ResourcePicker = {}
+
+---@class PickerNewArgs
+---@field on_select (fun(selection: KubernetesObjectMeta) | nil)
+---@field editable (boolean | nil)
+---@field entry_modifier (fun(buffer: Buffer, index: integer, object: KubernetesObject) | nil)
+---@field additional_keymaps (AdditionalKeymap[] | nil)
+
+---@class AdditionalKeymap
+---@field mode
+---| "n"
+---| "i"
+---| "v"
+---@field key string
+---@field action fun(picker: ResourcePicker): function
+---@field opts table|nil
 
 ---@param resources Resources
----@param args { on_select: (fun(selection: KubernetesObjectMeta) | nil), editable: (boolean | nil), entry_modifier: (fun(buffer: Buffer, index: integer, object: KubernetesObject) | nil) }
-function M.new(resources, args)
-    local objects = resources:list()
+---@param args PickerNewArgs
+function ResourcePicker:new(resources, args)
+    local o = {}
+    o = vim.deepcopy(self)
 
-    if objects ~= nil then
-        local Buffer = buffer:new()
-        Buffer:vim_api("nvim_buf_set_option", "buftype", "")
-        Buffer:vim_api("nvim_buf_set_name", "k8s://" .. resources.kind)
+    o.resources = resources
+    o.objects = resources:list()
 
-        for index, object in ipairs(objects) do
-            Buffer:vim_api("nvim_buf_set_lines", index - 1, index, false, { object.metadata.name })
+    if o.objects ~= nil then
+        o.buffer = buffer:new()
+        o.buffer:vim_api("nvim_buf_set_option", "buftype", "")
+        o.buffer:vim_api("nvim_buf_set_name", "k8s://" .. resources.kind)
+
+        for index, object in ipairs(o.objects) do
+            o.buffer:vim_api("nvim_buf_set_lines", index - 1, index, false, { object.metadata.name })
 
             if args.entry_modifier then
-                args.entry_modifier(Buffer, index, object)
+                args.entry_modifier(o.buffer, index, object)
             end
         end
 
-        Buffer:vim_api("nvim_buf_set_option", "modifiable", false)
+        o.buffer:vim_api("nvim_buf_set_option", "modifiable", false)
 
-        Buffer:keymap("n", "e", function()
+        o.buffer:keymap("n", "e", function()
             if args.editable ~= false then
                 local cursor_location = vim.api.nvim_win_get_cursor(0)
-                local object = objects[cursor_location[1]]
+                local object = o.objects[cursor_location[1]]
 
                 EditBuffer = buffer:new()
                 EditBuffer:vim_api("nvim_buf_set_name", "k8s://" .. resources.kind .. "/" .. object.metadata.name)
@@ -51,7 +74,7 @@ function M.new(resources, args)
                     EditBuffer:vim_api("nvim_buf_delete", { force = true })
                 end)
 
-                Buffer:vim_api("nvim_buf_delete", { force = true })
+                o.buffer:vim_api("nvim_buf_delete", { force = true })
 
                 vim.api.nvim_create_autocmd({ "BufWriteCmd" }, {
                     buffer = EditBuffer.buffer,
@@ -63,7 +86,7 @@ function M.new(resources, args)
                         resources:patch(object.metadata, vim.json.encode(diff))
                         EditBuffer:vim_api("nvim_buf_delete", { force = true })
 
-                        M.new(resources, args)
+                        ResourcePicker:new(resources, args)
                     end,
                 })
             else
@@ -71,32 +94,40 @@ function M.new(resources, args)
             end
         end)
 
-        Buffer:keymap("n", "s", function()
+        o.buffer:keymap("n", "s", function()
             if args.on_select ~= nil then
                 local cursor_location = vim.api.nvim_win_get_cursor(0)
-                local object = objects[cursor_location[1]]
+                local object = o.objects[cursor_location[1]]
 
                 args.on_select(object.metadata)
 
-                Buffer:vim_api("nvim_buf_delete", { force = true })
+                o.buffer:vim_api("nvim_buf_delete", { force = true })
             else
                 print("Unselectable Resource: " .. resources.kind)
             end
         end)
 
-        Buffer:keymap("n", "q", function()
-            Buffer:vim_api("nvim_buf_delete", { force = true })
+        o.buffer:keymap("n", "q", function()
+            o.buffer:vim_api("nvim_buf_delete", { force = true })
         end)
 
-        Buffer:keymap("n", "r", function()
-            Buffer:vim_api("nvim_buf_delete", { force = true })
-            M.new(resources, args)
+        o.buffer:keymap("n", "r", function()
+            o.buffer:vim_api("nvim_buf_delete", { force = true })
+            ResourcePicker:new(resources, args)
         end)
 
-        Buffer:vim_api("nvim_set_current_buf")
+        if args.additional_keymaps ~= nil then
+            for _, v in ipairs(args.additional_keymaps) do
+                o.buffer:keymap(v.mode, v.key, v.action(o), v.opts)
+            end
+        end
+
+        o.buffer:vim_api("nvim_set_current_buf")
     else
         print("Empty list resource request: " .. resources.kind)
     end
+
+    return o
 end
 
-return M
+return ResourcePicker

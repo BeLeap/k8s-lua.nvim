@@ -6,7 +6,8 @@ local M = {}
 
 M.select = function()
     local deployments = resources:new("deployments", "apis/apps/v1", true, global_contexts.selected_namespace)
-    pickers.new(deployments, {
+
+    pickers:new(deployments, {
         entry_modifier = function(buffer, index, object)
             local deployment = object --[[@as Deployment]]
 

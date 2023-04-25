@@ -3,7 +3,7 @@ local client = require("k8s.api.client")
 ---@class KubernetesResources: Resources
 ---@field public api_version string
 ---@field public is_namespaced boolean
----@field private api_prefix string
+---@field protected api_prefix string
 local KubernetesResources = {}
 
 ---@param kind string
@@ -66,7 +66,6 @@ end
 ---@param name string
 ---@return KubernetesObject|nil
 function KubernetesResources:get(name)
-    print(self.api_prefix .. "/" .. name)
     return client.get(self.api_prefix .. "/" .. name)
 end
 

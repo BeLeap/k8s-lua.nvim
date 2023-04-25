@@ -29,7 +29,7 @@ end
 ---| "v"
 ---@param key string
 ---@param action function
----@param opts {}|nil
+---@param opts table|nil
 function Buffer:keymap(mode, key, action, opts)
     local opts_with_buf = vim.tbl_deep_extend("keep", opts or {}, { buffer = self.buffer })
 
