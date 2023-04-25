@@ -7,18 +7,12 @@ function Buffer:new()
     local o = {}
     o = vim.deepcopy(self)
 
-    local buffer = vim.api.nvim_create_buf(false, true)
+    local buffer = vim.api.nvim_create_buf(true, true)
     o.buffer = buffer
 
     o:keymap("n", "q", function()
         o:vim_api("nvim_buf_delete", { force = true })
     end)
-
-    o:create_autocmd({ "BufLeave" }, {
-        callback = function(_ev)
-            o:vim_api("nvim_buf_delete", { force = true })
-        end,
-    })
 
     return o
 end

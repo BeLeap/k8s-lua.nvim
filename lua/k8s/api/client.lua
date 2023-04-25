@@ -28,14 +28,27 @@ M.update_proxy = function()
     M.proxy = new_api_proxy
 end
 
+---@param path string
+---@param query_param table<string,string>|nil
 ---@return string|nil
-M.get_raw_body = function(path)
+M.get_raw_body = function(path, query_param)
     vim.validate({
         path = { path, "string" },
     })
     M.update_proxy()
 
     local url = "localhost:" .. tostring(M.proxy.port) .. path
+
+    if query_param ~= nil then
+        url = url .. "?"
+
+        local query_strings = {}
+        for k, v in pairs(query_param) do
+            table.insert(query_strings, k .. "=" .. v)
+        end
+        url = url .. table.concat(query_strings, "&")
+    end
+
     local res = curl.get(url)
 
     if res ~= nil then

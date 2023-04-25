@@ -14,6 +14,14 @@
 ---@class Pod: KubernetesObject
 ---@field kind "Pod"
 ---@field status PodStatus
+---@field spec PodSpec
+
+---@class PodSpec
+---@field initContainers Container[]
+---@field containers Container[]
+
+---@class Container
+---@field name string
 
 ---@class PodStatus
 ---@field phase

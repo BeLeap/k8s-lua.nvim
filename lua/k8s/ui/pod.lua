@@ -38,18 +38,22 @@ M.select = function()
                 action = function(picker)
                     return function()
                         local cursor_location = vim.api.nvim_win_get_cursor(0)
-                        local object = picker.objects[cursor_location[1]]
-                        local log = pods:get_log(object.metadata)
+                        local object = picker.objects[cursor_location[1]] --[[@as Pod]]
+                        local logs = pods:get_log(object)
 
-                        local LogBuffer = buffer:new()
-                        LogBuffer:vim_api("nvim_buf_set_option", "buftype", "")
-                        LogBuffer:vim_api("nvim_buf_set_name", "k8s://" .. pods.kind .. "/logs")
-                        LogBuffer:vim_api("nvim_buf_set_option", "ft", "log")
-                        LogBuffer:vim_api("nvim_buf_set_lines", 0, -1, false, vim.fn.split(log, "\n"))
+                        for k, v in pairs(logs) do
+                            local LogBuffer = buffer:new()
+                            local buffer_name = "k8s://" .. pods.kind .. "/logs/" .. k
 
-                        LogBuffer:vim_api("nvim_set_current_buf")
+                            LogBuffer:vim_api("nvim_buf_set_option", "buftype", "")
+                            LogBuffer:vim_api("nvim_buf_set_name", buffer_name)
+                            LogBuffer:vim_api("nvim_buf_set_option", "ft", "log")
+                            LogBuffer:vim_api("nvim_buf_set_lines", 0, -1, false, vim.fn.split(v, "\n"))
 
-                        picker.buffer:vim_api("nvim_buf_delete", { force = true })
+                            vim.cmd.split(buffer_name)
+                        end
+
+                        -- picker.buffer:vim_api("nvim_buf_delete", { force = true })
                     end
                 end,
             },
