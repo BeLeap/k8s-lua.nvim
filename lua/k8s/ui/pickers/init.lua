@@ -70,14 +70,9 @@ function ResourcePicker:new(resources, args)
 
                 EditBuffer:vim_api("nvim_set_current_buf")
 
-                EditBuffer:keymap("n", "q", function()
-                    EditBuffer:vim_api("nvim_buf_delete", { force = true })
-                end)
-
                 o.buffer:vim_api("nvim_buf_delete", { force = true })
 
-                vim.api.nvim_create_autocmd({ "BufWriteCmd" }, {
-                    buffer = EditBuffer.buffer,
+                EditBuffer:create_autocmd({ "BufWriteCmd" }, {
                     callback = function(ev)
                         local content_raw = utils.join_to_string(vim.api.nvim_buf_get_lines(ev.buf, 0, -1, false))
                         local content = load("return " .. content_raw)()
@@ -85,8 +80,6 @@ function ResourcePicker:new(resources, args)
 
                         resources:patch(object.metadata, vim.json.encode(diff))
                         EditBuffer:vim_api("nvim_buf_delete", { force = true })
-
-                        ResourcePicker:new(resources, args)
                     end,
                 })
             else
@@ -105,10 +98,6 @@ function ResourcePicker:new(resources, args)
             else
                 print("Unselectable Resource: " .. resources.kind)
             end
-        end)
-
-        o.buffer:keymap("n", "q", function()
-            o.buffer:vim_api("nvim_buf_delete", { force = true })
         end)
 
         o.buffer:keymap("n", "r", function()

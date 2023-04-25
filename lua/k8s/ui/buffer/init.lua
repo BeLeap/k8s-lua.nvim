@@ -10,7 +10,28 @@ function Buffer:new()
     local buffer = vim.api.nvim_create_buf(false, true)
     o.buffer = buffer
 
+    o:keymap("n", "q", function()
+        o:vim_api("nvim_buf_delete", { force = true })
+    end)
+
+    o:create_autocmd({ "BufLeave" }, {
+        callback = function(_ev)
+            o:vim_api("nvim_buf_delete", { force = true })
+        end,
+    })
+
     return o
+end
+
+---@alias Event
+---| "BufWriteCmd"
+---| "BufLeave"
+
+---@param event Event[]
+---@param opts table|nil
+function Buffer:create_autocmd(event, opts)
+    local opts_with_buf = vim.tbl_deep_extend("keep", opts or {}, { buffer = self.buffer })
+    vim.api.nvim_create_autocmd(event, opts_with_buf)
 end
 
 ---@param ns NamespaceId
@@ -44,6 +65,7 @@ end
 ---| "nvim_buf_set_name"
 ---| "nvim_buf_set_option"
 ---| "nvim_set_current_buf"
+---| "nvim_create_autocmd"
 ---@param ...any
 function Buffer:vim_api(func_name, ...)
     return vim.api[func_name](self.buffer, ...)

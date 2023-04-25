@@ -49,10 +49,6 @@ M.select = function()
 
                         LogBuffer:vim_api("nvim_set_current_buf")
 
-                        LogBuffer:keymap("n", "q", function()
-                            LogBuffer:vim_api("nvim_buf_delete", { force = true })
-                        end)
-
                         picker.buffer:vim_api("nvim_buf_delete", { force = true })
                     end
                 end,
