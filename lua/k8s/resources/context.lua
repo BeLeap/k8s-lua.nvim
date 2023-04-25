@@ -1,9 +1,11 @@
 local kube_config = require("k8s.kube_config")
 
 ---@class ContextResources: Resources
-local ContextResources = {
-    fqdn = "contexts",
-}
+local ContextResources = {}
+
+function ContextResources:build_fqdn()
+    return "contexts"
+end
 
 -- get current context
 ---@return string|nil
