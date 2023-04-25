@@ -47,12 +47,15 @@ M.select = function()
 
                             LogBuffer:vim_api("nvim_buf_set_option", "buftype", "")
                             LogBuffer:vim_api("nvim_buf_set_option", "ft", "log")
-                            LogBuffer:vim_api("nvim_buf_set_lines", 0, -1, false, vim.fn.split(v, "\n"))
+
+                            ---@type string[]
+                            local lines = vim.fn.split(v, "\n")
+
+                            LogBuffer:vim_api("nvim_buf_set_lines", 0, -1, false, lines)
 
                             vim.cmd.split(LogBuffer.name)
+                            vim.api.nvim_win_set_cursor(0, { #lines, 0 })
                         end
-
-                        -- picker.buffer:vim_api("nvim_buf_delete", { force = true })
                     end
                 end,
             },
