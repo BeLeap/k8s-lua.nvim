@@ -36,7 +36,6 @@ M.get_raw_body = function(path)
     M.update_proxy()
 
     local url = "localhost:" .. tostring(M.proxy.port) .. path
-    print(url)
     local res = curl.get(url)
 
     if res ~= nil then
