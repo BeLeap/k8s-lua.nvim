@@ -28,19 +28,29 @@ M.update_proxy = function()
     M.proxy = new_api_proxy
 end
 
----@return table|nil
-M.get = function(path)
+---@return string|nil
+M.get_raw_body = function(path)
     vim.validate({
         path = { path, "string" },
     })
     M.update_proxy()
 
     local url = "localhost:" .. tostring(M.proxy.port) .. path
+    print(url)
     local res = curl.get(url)
 
-    local data = nil
     if res ~= nil then
-        data = vim.json.decode(res.body)
+        return res.body
+    end
+end
+
+---@return table|nil
+M.get = function(path)
+    local body = M.get_raw_body(path)
+
+    local data = nil
+    if body ~= nil then
+        data = vim.json.decode(body)
     end
 
     return data

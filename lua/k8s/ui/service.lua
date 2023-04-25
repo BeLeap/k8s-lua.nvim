@@ -6,7 +6,7 @@ local M = {}
 
 M.select = function()
     local statefulsets = resources:new("services", "api/v1", true, global_contexts.selected_namespace)
-    pickers.new(statefulsets, {})
+    pickers:new(statefulsets, {})
 end
 
 return M
