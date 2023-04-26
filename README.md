@@ -20,7 +20,7 @@ Thank you for your understanding!
   "BeLeap/k8s-lua.nvim",
   dependencies = {
    "nvim-treesitter/nvim-treesitter",
-   "rcarriga/nvim-notify", -- Optional Dependency
+   "rcarriga/nvim-notify", -- Optional
   },
   cmd = { "Kube" },
   config = true,
