@@ -7,7 +7,6 @@ local M = {}
 -- select context with telescope picker
 M.select = function()
   pickers:new(resources_context, {
-    editable = false,
     on_select = function(selection)
       global_contexts.selected_contexts = selection.name
     end,

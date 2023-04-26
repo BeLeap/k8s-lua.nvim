@@ -70,4 +70,10 @@ function KubernetesResources:get(name)
   return client.get(self:build_url(self:build_fqdn()) .. "/" .. name)
 end
 
+---@param metadata KubernetesObjectMeta
+---@return CurlResponse|nil
+function KubernetesResources:delete(metadata)
+  return client.delete(self:build_url(self:build_fqdn(metadata.namespace)) .. "/" .. metadata.name)
+end
+
 return KubernetesResources

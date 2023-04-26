@@ -14,7 +14,6 @@ local ResourcePicker = {}
 
 ---@class PickerNewArgs
 ---@field on_select (fun(selection: KubernetesObjectMeta) | nil)
----@field editable (boolean | nil)
 ---@field entry_modifier (fun(buffer: Buffer, index: integer, object: KubernetesObject) | nil)
 ---@field additional_keymaps (AdditionalKeymap[] | nil)
 
@@ -52,7 +51,7 @@ function ResourcePicker:new(resources, args)
     o.buffer:vim_api("nvim_buf_set_option", "modifiable", false)
 
     o.buffer:keymap("n", "e", function()
-      if args.editable ~= false then
+      if o.resources.patch ~= nil and o.resources.get ~= nil then
         local cursor_location = vim.api.nvim_win_get_cursor(0)
         local object = o.objects[cursor_location[1]]
 
@@ -78,6 +77,36 @@ function ResourcePicker:new(resources, args)
         })
       else
         print("Uneditable Resource: " .. resources.kind)
+      end
+    end)
+
+    o.buffer:keymap("n", "d", function()
+      if o.resources.delete ~= nil then
+        local cursor_location = vim.api.nvim_win_get_cursor(0)
+        local object = o.objects[cursor_location[1]]
+
+        vim.ui.input(
+          { prompt = "Delete " .. o.resources.kind .. "/" .. object.metadata.name .. " (Y/n)" },
+          function(input)
+            if input == "Y" then
+              local result = o.resources:delete(object.metadata)
+
+              if result ~= nil then
+                if result.status == 200 then
+                  print(o.resources.kind .. "/" .. object.metadata.name .. " delete requested")
+                else
+                  print("failed to delete " .. o.resources.kind .. "/" .. object.metadata.name)
+                end
+              else
+                print("failed to request delete " .. o.resources.kind .. "/" .. object.metadata.name)
+              end
+            else
+              print("Aborted")
+            end
+          end
+        )
+      else
+        print("Undeletable Resource: " .. resources.kind)
       end
     end)
 

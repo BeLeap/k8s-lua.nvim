@@ -9,9 +9,10 @@
 ---@field public kind string
 ---@field public api_group string
 ---@field public build_fqdn fun(self: Resources, namespace: string|nil): string
----@field public get fun(self: Resources, name: string): KubernetesObject|nil
+---@field public get ((fun(self: Resources, name: string): KubernetesObject|nil)|nil)
 ---@field public list fun(self: Resources): KubernetesObject[]|nil
----@field public patch fun(self: Resources, target: KubernetesObjectMeta, data: string): KubernetesObject|nil
+---@field public patch ((fun(self: Resources, metadata: KubernetesObjectMeta, data: string): KubernetesObject|nil)|nil)
+---@field public delete ((fun(self: Resources, metadata: KubernetesObjectMeta): CurlResponse|nil)|nil)
 
 ---@class Pod: KubernetesObject
 ---@field kind "Pod"

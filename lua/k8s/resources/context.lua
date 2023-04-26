@@ -91,21 +91,4 @@ function ContextResources:list()
   return contexts
 end
 
----get
----@param name string
----@return KubernetesObject|nil
-function ContextResources:get(name)
-  return nil
-end
-
----patch
----@param metadata KubernetesObjectMeta
----@param body string
----@return KubernetesObject|nil
-function ContextResources:patch(metadata, body)
-  print("Unpatchable Resource: " .. self.kind)
-
-  return nil
-end
-
 return ContextResources

@@ -2,6 +2,12 @@ local curl = require("plenary.curl")
 local api_proxy = require("k8s.api.proxy")
 local global_contexts = require("k8s.global_contexts")
 
+---@class CurlResponse
+---@field status integer
+---@field headers table<string, string>[]
+---@field body string
+---@field exit integer
+
 ---@class Client
 ---@field private proxy ApiProxy|nil
 ---@field private update_proxy fun(): nil
@@ -90,6 +96,15 @@ M.patch = function(path, body)
   end
 
   return data
+end
+
+---@param path string
+---@return CurlResponse|nil
+M.delete = function(path)
+  M.update_proxy()
+
+  local url = "localhost:" .. tostring(api_proxy.port) .. path
+  return curl.delete(url)
 end
 
 return M
