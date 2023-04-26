@@ -38,24 +38,24 @@ current-context: minikube-1
 ]]
 
 describe("contexts", function()
-    before_each(function()
-        context.config = {}
-        context.config.context = {
-            location = "~/.kube/config",
-        }
+  before_each(function()
+    context.config = {}
+    context.config.context = {
+      location = "~/.kube/config",
+    }
+  end)
+
+  it("get_current", function()
+    it("should return current context", function()
+      local mock_utils = mock(utils, true)
+      mock_utils.readfile.returns(mock_kubeconfig)
+
+      local contexts = context.get_current()
+      assert.are.same("minikube-1", contexts)
     end)
 
-    it("get_current", function()
-        it("should return current context", function()
-            local mock_utils = mock(utils, true)
-            mock_utils.readfile.returns(mock_kubeconfig)
-
-            local contexts = context.get_current()
-            assert.are.same("minikube-1", contexts)
-        end)
-
-        it("should return nil if no current-context specified", function()
-            local mock_kubeconfig_without_current_context = [[
+    it("should return nil if no current-context specified", function()
+      local mock_kubeconfig_without_current_context = [[
             apiVersion: v1
             kind: Config
             clusters:
@@ -89,24 +89,21 @@ describe("contexts", function()
                 user: minikube-2
             ]]
 
-            local mock_utils = mock(utils, true)
-            mock_utils.readfile.returns(mock_kubeconfig_without_current_context)
+      local mock_utils = mock(utils, true)
+      mock_utils.readfile.returns(mock_kubeconfig_without_current_context)
 
-            local contexts = context.get_current()
-            assert.are.same(nil, contexts)
-        end)
+      local contexts = context.get_current()
+      assert.are.same(nil, contexts)
     end)
+  end)
 
-    it("list", function()
-        it("should return list of contexts", function()
-            local mock_utils = mock(utils, true)
-            mock_utils.readfile.returns(mock_kubeconfig)
+  it("list", function()
+    it("should return list of contexts", function()
+      local mock_utils = mock(utils, true)
+      mock_utils.readfile.returns(mock_kubeconfig)
 
-            local contexts = context:list()
-            assert.are.same(
-                { { metadata = { name = "minikube-1" } }, { metadata = { name = "minikube-2" } } },
-                contexts
-            )
-        end)
+      local contexts = context:list()
+      assert.are.same({ { metadata = { name = "minikube-1" } }, { metadata = { name = "minikube-2" } } }, contexts)
     end)
+  end)
 end)

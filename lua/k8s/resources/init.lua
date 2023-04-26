@@ -14,60 +14,60 @@ local KubernetesResources = {}
 ---@param namespace string|nil
 ---@return KubernetesResources
 function KubernetesResources:new(kind, api, api_group, is_namespaced, namespace)
-    local o = {}
-    o = vim.deepcopy(self)
+  local o = {}
+  o = vim.deepcopy(self)
 
-    o.kind = kind
-    o.api = api
-    o.api_group = api_group
-    o.is_namespaced = is_namespaced
-    o.namespace = namespace
+  o.kind = kind
+  o.api = api
+  o.api_group = api_group
+  o.is_namespaced = is_namespaced
+  o.namespace = namespace
 
-    return o
+  return o
 end
 
 ---@param namespace string|nil
 function KubernetesResources:build_fqdn(namespace)
-    local fqdn = self.api_group
+  local fqdn = self.api_group
 
-    if self.is_namespaced then
-        if self.namespace ~= nil then
-            fqdn = fqdn .. "/namespaces/" .. self.namespace
-        elseif namespace ~= nil then
-            fqdn = fqdn .. "/namespaces/" .. namespace
-        end
+  if self.is_namespaced then
+    if self.namespace ~= nil then
+      fqdn = fqdn .. "/namespaces/" .. self.namespace
+    elseif namespace ~= nil then
+      fqdn = fqdn .. "/namespaces/" .. namespace
     end
+  end
 
-    fqdn = fqdn .. "/" .. self.kind
+  fqdn = fqdn .. "/" .. self.kind
 
-    return fqdn
+  return fqdn
 end
 
 ---@param fqdn string
 function KubernetesResources:build_url(fqdn)
-    return "/" .. self.api .. "/" .. fqdn
+  return "/" .. self.api .. "/" .. fqdn
 end
 
 ---@param metadata KubernetesObjectMeta
 ---@param body string
 function KubernetesResources:patch(metadata, body)
-    return client.patch(self:build_url(self:build_fqdn(metadata.namespace)) .. "/" .. metadata.name, body)
+  return client.patch(self:build_url(self:build_fqdn(metadata.namespace)) .. "/" .. metadata.name, body)
 end
 
 ---@return KubernetesObject[]|nil
 function KubernetesResources:list()
-    local data
-    data = client.get(self:build_url(self:build_fqdn()))
+  local data
+  data = client.get(self:build_url(self:build_fqdn()))
 
-    if data ~= nil then
-        return data.items
-    end
+  if data ~= nil then
+    return data.items
+  end
 end
 
 ---@param name string
 ---@return KubernetesObject|nil
 function KubernetesResources:get(name)
-    return client.get(self:build_url(self:build_fqdn()) .. "/" .. name)
+  return client.get(self:build_url(self:build_fqdn()) .. "/" .. name)
 end
 
 return KubernetesResources

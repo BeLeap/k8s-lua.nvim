@@ -6,26 +6,26 @@ local highlight = require("k8s.highlight")
 local M = {}
 
 M.config = {
-    kube_config = {
-        location = "~/.kube/config",
+  kube_config = {
+    location = "~/.kube/config",
+  },
+  resources = {
+    pod = {
+      log = {
+        max_lines = 1000,
+      },
     },
-    resources = {
-        pod = {
-            log = {
-                max_lines = 1000,
-            },
-        },
-    },
+  },
 }
 
 M.setup = function(user_config)
-    M.config = vim.tbl_deep_extend("force", M.config, user_config or {})
+  M.config = vim.tbl_deep_extend("force", M.config, user_config or {})
 
-    kube_config.setup(M.config)
-    global_contexts.setup()
+  kube_config.setup(M.config)
+  global_contexts.setup()
 
-    commands.setup()
-    highlight.setup()
+  commands.setup()
+  highlight.setup()
 end
 
 return M

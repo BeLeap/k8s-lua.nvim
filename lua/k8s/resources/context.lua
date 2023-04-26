@@ -4,15 +4,15 @@ local kube_config = require("k8s.kube_config")
 local ContextResources = {}
 
 function ContextResources:build_fqdn()
-    return "contexts"
+  return "contexts"
 end
 
 -- get current context
 ---@return string|nil
 ContextResources.get_current = function()
-    local parser, tree = kube_config.load_config()
+  local parser, tree = kube_config.load_config()
 
-    local ts_query = [[
+  local ts_query = [[
 (document
   (block_node
     (block_mapping
@@ -26,25 +26,25 @@ ContextResources.get_current = function()
 )
     ]]
 
-    local query = vim.treesitter.query.parse("yaml", ts_query)
+  local query = vim.treesitter.query.parse("yaml", ts_query)
 
-    for id, node, _ in query:iter_captures(tree[1]:root(), parser:source(), 0, -1) do
-        local name = query.captures[id]
+  for id, node, _ in query:iter_captures(tree[1]:root(), parser:source(), 0, -1) do
+    local name = query.captures[id]
 
-        if name == "value" then
-            return vim.treesitter.get_node_text(node, parser:source())
-        end
+    if name == "value" then
+      return vim.treesitter.get_node_text(node, parser:source())
     end
+  end
 
-    return nil
+  return nil
 end
 
 -- get list of contexts
 ---@return KubernetesObject[]|nil
 function ContextResources:list()
-    local parser, tree = kube_config.load_config()
+  local parser, tree = kube_config.load_config()
 
-    local ts_query = [[
+  local ts_query = [[
 (document
   (block_node
     (block_mapping
@@ -72,30 +72,30 @@ function ContextResources:list()
 )
     ]]
 
-    local query = vim.treesitter.query.parse("yaml", ts_query)
+  local query = vim.treesitter.query.parse("yaml", ts_query)
 
-    ---@type KubernetesObject[]
-    local contexts = {}
-    for id, node, _ in query:iter_captures(tree[1]:root(), parser:source(), 0, -1) do
-        local name = query.captures[id]
+  ---@type KubernetesObject[]
+  local contexts = {}
+  for id, node, _ in query:iter_captures(tree[1]:root(), parser:source(), 0, -1) do
+    local name = query.captures[id]
 
-        if name == "value" then
-            table.insert(contexts, {
-                metadata = {
-                    name = vim.treesitter.get_node_text(node, parser:source()),
-                },
-            })
-        end
+    if name == "value" then
+      table.insert(contexts, {
+        metadata = {
+          name = vim.treesitter.get_node_text(node, parser:source()),
+        },
+      })
     end
+  end
 
-    return contexts
+  return contexts
 end
 
 ---get
 ---@param name string
 ---@return KubernetesObject|nil
 function ContextResources:get(name)
-    return nil
+  return nil
 end
 
 ---patch
@@ -103,9 +103,9 @@ end
 ---@param body string
 ---@return KubernetesObject|nil
 function ContextResources:patch(metadata, body)
-    print("Unpatchable Resource: " .. self.kind)
+  print("Unpatchable Resource: " .. self.kind)
 
-    return nil
+  return nil
 end
 
 return ContextResources
