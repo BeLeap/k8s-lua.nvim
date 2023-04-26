@@ -93,12 +93,21 @@ function ResourcePicker:new(resources, args)
 
               if result ~= nil then
                 if result.status == 200 then
-                  print(o.resources.kind .. "/" .. object.metadata.name .. " delete requested")
+                  vim.notify(
+                    o.resources.kind .. "/" .. object.metadata.name .. " delete requested",
+                    vim.log.levels.INFO
+                  )
                 else
-                  print("failed to delete " .. o.resources.kind .. "/" .. object.metadata.name)
+                  vim.notify(
+                    "failed to delete " .. o.resources.kind .. "/" .. object.metadata.name,
+                    vim.log.levels.ERROR
+                  )
                 end
               else
-                print("failed to request delete " .. o.resources.kind .. "/" .. object.metadata.name)
+                vim.notify(
+                  "failed to request delete " .. o.resources.kind .. "/" .. object.metadata.name,
+                  vim.log.levels.ERROR
+                )
               end
             else
               print("Aborted")
@@ -108,6 +117,35 @@ function ResourcePicker:new(resources, args)
       else
         print("Undeletable Resource: " .. resources.kind)
       end
+    end)
+
+    o.buffer:keymap("v", "d", function()
+      local from = vim.fn.line("v")
+      local to = vim.fn.line(".")
+      local s_objects = vim.list_slice(o.objects, from, to)
+
+      vim.ui.input({ prompt = "Delete " .. #s_objects .. " " .. o.resources.kind .. " (Y/n)" }, function(input)
+        for _, object in pairs(s_objects) do
+          if input == "Y" then
+            local result = o.resources:delete(object.metadata)
+
+            if result ~= nil then
+              if result.status == 200 then
+                vim.notify(o.resources.kind .. "/" .. object.metadata.name .. " delete requested", vim.log.levels.INFO)
+              else
+                vim.notify("failed to delete " .. o.resources.kind .. "/" .. object.metadata.name, vim.log.levels.ERROR)
+              end
+            else
+              vim.notify(
+                "failed to request delete " .. o.resources.kind .. "/" .. object.metadata.name,
+                vim.log.levels.ERROR
+              )
+            end
+          else
+            print("Aborted")
+          end
+        end
+      end)
     end)
 
     o.buffer:keymap("n", "s", function()

@@ -61,7 +61,7 @@ end
 ---| "i"
 ---| "v"
 ---@param key string
----@param action function
+---@param action function|string
 ---@param opts table|nil
 function Buffer:keymap(mode, key, action, opts)
   local opts_with_buf = vim.tbl_deep_extend("keep", opts or {}, { buffer = self.buffer })
@@ -74,10 +74,12 @@ end
 ---| "nvim_buf_delete"
 ---| "nvim_buf_set_extmark"
 ---| "nvim_buf_set_lines"
+---| "nvim_buf_get_lines"
 ---| "nvim_buf_set_name"
 ---| "nvim_buf_set_option"
 ---| "nvim_set_current_buf"
 ---| "nvim_create_autocmd"
+---| "nvim_buf_get_mark"
 ---@param ...any
 function Buffer:vim_api(func_name, ...)
   return vim.api[func_name](self.buffer, ...)

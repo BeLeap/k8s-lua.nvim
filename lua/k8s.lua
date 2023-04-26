@@ -3,6 +3,11 @@ local kube_config = require("k8s.kube_config")
 local global_contexts = require("k8s.global_contexts")
 local highlight = require("k8s.highlight")
 
+local notify_exists, notify = pcall(require, "notify")
+if notify_exists then
+  vim.notify = notify
+end
+
 local M = {}
 
 M.config = {
