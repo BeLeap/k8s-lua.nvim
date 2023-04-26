@@ -1,3 +1,4 @@
+local global_contexts = require("k8s.global_contexts")
 local aliases = {
   ["context"] = {
     "ctx",
@@ -76,12 +77,38 @@ local M = {
         ui.select()
       end,
     },
+    {
+      name = "KubeApply",
+      command = function()
+        ---@type BufferHandle
+        local current_buffer = vim.api.nvim_get_current_buf()
+        local contents = table.concat(vim.api.nvim_buf_get_lines(current_buffer, 0, -1, false), "\n")
+
+        local handle = io.popen(
+          "kubectl --context="
+            .. global_contexts.selected_contexts
+            .. " --namespace="
+            .. (global_contexts.selected_namespace or "default")
+            .. " apply -f - <<EOF\n"
+            .. contents
+            .. "\nEOF"
+        )
+        if handle ~= nil then
+          local result = handle:read("*a")
+          handle:close()
+
+          print(result)
+        else
+          print("failed to create process.")
+        end
+      end,
+    },
   },
 }
 
 M.setup = function()
   for _, command in ipairs(M.commands) do
-    local opts = vim.tbl_extend("force", command.opts, { force = true })
+    local opts = vim.tbl_extend("force", command.opts or {}, { force = true })
     vim.api.nvim_create_user_command(command.name, command.command, opts)
   end
 end
