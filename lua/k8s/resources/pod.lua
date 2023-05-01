@@ -1,6 +1,6 @@
 local client = require("k8s.api.client")
 local KubernetesResources = require("k8s.resources")
-local k8s = require("k8s")
+local config = require("k8s.config")
 
 ---@class PodResources: KubernetesResources
 local PodResources = {}
@@ -25,7 +25,7 @@ function PodResources:get_log(object)
     result[container.name] =
       client.get_raw_body(self:build_url(self:build_fqdn(object.metadata.namespace)) .. "/" .. name .. "/" .. "log", {
         container = container.name,
-        tailLines = tostring(k8s.config.resources.pod.log.max_lines),
+        tailLines = tostring(config.resources.pod.log.max_lines),
       })
   end
 

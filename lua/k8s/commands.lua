@@ -1,40 +1,21 @@
 local global_contexts = require("k8s.global_contexts")
-local aliases = {
-  ["context"] = {
-    "ctx",
-    "contexts",
+local autocompleter = require("k8s.autocompleter")
+local resources = require("k8s.resources")
+local available = require("k8s.resources.available")
+local pickers = require("k8s.ui.pickers")
+
+local predefined = {
+  core = {
+    contexts = require("k8s.ui.contexts"),
+    namespaces = require("k8s.ui.namespaces"),
+    pods = require("k8s.ui.pods"),
+    services = require("k8s.ui.services"),
   },
-  ["namespace"] = {
-    "ns",
-    "namespaces",
-  },
-  ["pod"] = {
-    "po",
-    "pods",
-  },
-  ["deployment"] = {
-    "deploy",
-    "deployments",
-  },
-  ["statefulset"] = {
-    "sts",
-    "statefulsets",
-  },
-  ["service"] = {
-    "svc",
-    "services",
+  ["apps/v1"] = {
+    deployments = require("k8s.ui.deployments"),
+    statefulsets = require("k8s.ui.statefulsets"),
   },
 }
-
-local lookup_table = {}
-
-local gen_lookup_table = function()
-  for k, alias in pairs(aliases) do
-    for _, v in ipairs(alias) do
-      lookup_table[v] = k
-    end
-  end
-end
 
 local M = {
   commands = {
@@ -42,21 +23,16 @@ local M = {
       name = "Kube",
       opts = {
         nargs = "*",
-        complete = function(arglead, _line)
-          local resources = { "context", "namespace", "pod", "deployment", "statefulset", "service" }
+        complete = function(arglead, line)
+          local args = vim.split(line, " ")
 
-          local match = {}
-          if arglead ~= nil then
-            for _, resource in ipairs(resources) do
-              if vim.startswith(resource, arglead) then
-                table.insert(match, resource)
-              end
-            end
+          if #args == 2 then
+            return autocompleter.apis_completer(arglead)
+          elseif #args == 3 then
+            return autocompleter.resources_completer(args[2], arglead)
           else
-            match = resources
+            return {}
           end
-
-          return match
         end,
       },
       command = function(opts)
@@ -65,16 +41,17 @@ local M = {
           return
         end
 
-        local module_found, ui = pcall(require, "k8s.ui." .. opts.args)
+        local api_group = opts.fargs[1]
+        local kind = opts.fargs[2]
 
-        if not module_found then
-          if vim.tbl_isempty(lookup_table) then
-            gen_lookup_table()
-          end
+        if predefined[api_group] ~= nil and predefined[api_group][kind] then
+          predefined[api_group][kind].select()
+        else
+          local resource =
+            resources:new(kind, api_group, available.is_namespaced(api_group, kind), global_contexts.selected_namespace)
 
-          ui = require("k8s.ui." .. lookup_table[opts.args])
+          pickers:new(resource)
         end
-        ui.select()
       end,
     },
     {
