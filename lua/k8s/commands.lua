@@ -1,4 +1,5 @@
 local global_contexts = require("k8s.global_contexts")
+local autocompleter = require("k8s.autocompleter")
 local aliases = {
   ["context"] = {
     "ctx",
@@ -42,21 +43,14 @@ local M = {
       name = "Kube",
       opts = {
         nargs = "*",
-        complete = function(arglead, _line)
-          local resources = { "context", "namespace", "pod", "deployment", "statefulset", "service" }
+        complete = function(arglead, line)
+          local args = vim.split(line, " ")
 
-          local match = {}
-          if arglead ~= nil then
-            for _, resource in ipairs(resources) do
-              if vim.startswith(resource, arglead) then
-                table.insert(match, resource)
-              end
-            end
-          else
-            match = resources
+          if #args == 2 then
+            return autocompleter.apis_completer(arglead)
+          elseif #args == 3 then
+            return autocompleter.resources_completer(args[2], arglead)
           end
-
-          return match
         end,
       },
       command = function(opts)
