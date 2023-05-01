@@ -6,14 +6,14 @@ local pickers = require("k8s.ui.pickers")
 
 local predefined = {
   core = {
-    contexts = require("k8s.ui.context"),
-    namespaces = require("k8s.ui.namespace"),
-    pods = require("k8s.ui.pod"),
-    services = require("k8s.ui.service"),
+    contexts = require("k8s.ui.contexts"),
+    namespaces = require("k8s.ui.namespaces"),
+    pods = require("k8s.ui.pods"),
+    services = require("k8s.ui.services"),
   },
   ["apps/v1"] = {
-    deployments = require("k8s.ui.deployment"),
-    statefulsets = require("k8s.ui.statefulset"),
+    deployments = require("k8s.ui.deployments"),
+    statefulsets = require("k8s.ui.statefulsets"),
   },
 }
 
