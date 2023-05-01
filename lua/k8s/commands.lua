@@ -6,6 +6,7 @@ local pickers = require("k8s.ui.pickers")
 
 local predefined = {
   core = {
+    contexts = require("k8s.ui.context"),
     namespaces = require("k8s.ui.namespace"),
     pods = require("k8s.ui.pod"),
     services = require("k8s.ui.service"),

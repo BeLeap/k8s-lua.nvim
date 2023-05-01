@@ -1,3 +1,4 @@
+local config = require("k8s.config")
 local utils = require("k8s.utils")
 
 ---@class KubeConfig
@@ -12,18 +13,13 @@ local M = {
 ---@return LanguageTree
 ---@return TSTree
 M.load_config = function()
-  local content = utils.readfile(vim.fs.normalize(M.config.kube_config.location or "~/.kube/config"))
+  local content = utils.readfile(vim.fs.normalize(config.kube_config.location or "~/.kube/config"))
 
   vim.treesitter.language.add("yaml")
   local parser = vim.treesitter.get_string_parser(content, "yaml")
   local tree = parser:parse()
 
   return parser, tree
-end
-
--- initial setup
-M.setup = function(config)
-  M.config.kube_config = config.kube_config
 end
 
 return M

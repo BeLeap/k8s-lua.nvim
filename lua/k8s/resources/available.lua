@@ -50,6 +50,10 @@ M.get_resources = function(api_group)
     table.insert(names, v.name)
   end
 
+  if api_group == "core" then
+    table.insert(names, "contexts")
+  end
+
   return names
 end
 
@@ -61,7 +65,7 @@ M.is_namespaced = function(api_group, kind)
   if result == nil then
     vim.notify("List " .. api_group .. " resources request failed", vim.log.levels.ERROR)
 
-    return {}
+    return false
   end
 
   local resources = {}

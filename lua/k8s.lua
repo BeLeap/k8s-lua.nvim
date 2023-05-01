@@ -1,5 +1,5 @@
 local commands = require("k8s.commands")
-local kube_config = require("k8s.kube_config")
+local config = require("k8s.config")
 local global_contexts = require("k8s.global_contexts")
 local highlight = require("k8s.highlight")
 
@@ -24,9 +24,7 @@ M.config = {
 }
 
 M.setup = function(user_config)
-  M.config = vim.tbl_deep_extend("force", M.config, user_config or {})
-
-  kube_config.setup(M.config)
+  config.setup(user_config)
   global_contexts.setup()
 
   commands.setup()
