@@ -1,6 +1,5 @@
 local client = require("k8s.api.client")
 local KubernetesResources = require("k8s.resources")
-local k8s = require("k8s")
 
 ---@class PodResources: KubernetesResources
 local PodResources = {}

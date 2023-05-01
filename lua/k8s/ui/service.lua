@@ -5,7 +5,7 @@ local global_contexts = require("k8s.global_contexts")
 local M = {}
 
 M.select = function()
-  local statefulsets = resources:new("services", "api", "v1", true, global_contexts.selected_namespace)
+  local statefulsets = resources:new("services", "core", true, global_contexts.selected_namespace)
   pickers:new(statefulsets, {})
 end
 

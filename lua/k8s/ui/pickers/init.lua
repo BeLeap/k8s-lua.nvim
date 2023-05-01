@@ -27,13 +27,15 @@ local ResourcePicker = {}
 ---@field opts table|nil
 
 ---@param resources Resources
----@param args PickerNewArgs
+---@param args PickerNewArgs|nil
 function ResourcePicker:new(resources, args)
   local o = {}
   o = vim.deepcopy(self)
 
   o.resources = resources
   o.objects = resources:list()
+
+  local normalized_args = args or {}
 
   if o.objects ~= nil then
     o.buffer = buffer:new("k8s://" .. resources:build_fqdn())
@@ -43,8 +45,8 @@ function ResourcePicker:new(resources, args)
     for index, object in ipairs(o.objects) do
       o.buffer:vim_api("nvim_buf_set_lines", index - 1, index, false, { object.metadata.name })
 
-      if args.entry_modifier then
-        args.entry_modifier(o.buffer, index, object)
+      if normalized_args.entry_modifier then
+        normalized_args.entry_modifier(o.buffer, index, object)
       end
     end
 
@@ -149,11 +151,11 @@ function ResourcePicker:new(resources, args)
     end)
 
     o.buffer:keymap("n", "s", function()
-      if args.on_select ~= nil then
+      if normalized_args.on_select ~= nil then
         local cursor_location = vim.api.nvim_win_get_cursor(0)
         local object = o.objects[cursor_location[1]]
 
-        args.on_select(object.metadata)
+        normalized_args.on_select(object.metadata)
 
         o.buffer:vim_api("nvim_buf_delete", { force = true })
       else
@@ -163,11 +165,11 @@ function ResourcePicker:new(resources, args)
 
     o.buffer:keymap("n", "r", function()
       o.buffer:vim_api("nvim_buf_delete", { force = true })
-      ResourcePicker:new(resources, args)
+      ResourcePicker:new(resources, normalized_args)
     end)
 
-    if args.additional_keymaps ~= nil then
-      for _, v in ipairs(args.additional_keymaps) do
+    if normalized_args.additional_keymaps ~= nil then
+      for _, v in ipairs(normalized_args.additional_keymaps) do
         o.buffer:keymap(v.mode, v.key, v.action(o), v.opts)
       end
     end

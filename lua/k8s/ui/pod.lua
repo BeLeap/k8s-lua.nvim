@@ -6,7 +6,7 @@ local global_contexts = require("k8s.global_contexts")
 local M = {}
 
 M.select = function()
-  local pods = resources:new("pods", "api", "v1", true, global_contexts.selected_namespace)
+  local pods = resources:new("pods", "core", true, global_contexts.selected_namespace)
 
   pickers:new(pods, {
     entry_modifier = function(picker_buffer, index, object)

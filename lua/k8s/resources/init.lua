@@ -1,24 +1,23 @@
 local client = require("k8s.api.client")
+local resources_util = require("k8s.resources.util")
 
 ---@class KubernetesResources: Resources
----@field public api string
 ---@field public api_group string
 ---@field public is_namespaced boolean
 ---@field public namespace string|nil
 local KubernetesResources = {}
 
 ---@param kind string
----@param api string
 ---@param api_group string
+---| "core"
 ---@param is_namespaced boolean
 ---@param namespace string|nil
 ---@return KubernetesResources
-function KubernetesResources:new(kind, api, api_group, is_namespaced, namespace)
+function KubernetesResources:new(kind, api_group, is_namespaced, namespace)
   local o = {}
   o = vim.deepcopy(self)
 
   o.kind = kind
-  o.api = api
   o.api_group = api_group
   o.is_namespaced = is_namespaced
   o.namespace = namespace
@@ -28,24 +27,24 @@ end
 
 ---@param namespace string|nil
 function KubernetesResources:build_fqdn(namespace)
-  local fqdn = self.api_group
+  local fqdn = ""
 
   if self.is_namespaced then
     if self.namespace ~= nil then
-      fqdn = fqdn .. "/namespaces/" .. self.namespace
+      fqdn = fqdn .. "namespaces/" .. self.namespace .. "/"
     elseif namespace ~= nil then
-      fqdn = fqdn .. "/namespaces/" .. namespace
+      fqdn = fqdn .. "namespaces/" .. namespace .. "/"
     end
   end
 
-  fqdn = fqdn .. "/" .. self.kind
+  fqdn = fqdn .. self.kind
 
   return fqdn
 end
 
 ---@param fqdn string
 function KubernetesResources:build_url(fqdn)
-  return "/" .. self.api .. "/" .. fqdn
+  return resources_util.path_mapper(self.api_group) .. "/" .. fqdn
 end
 
 ---@param metadata KubernetesObjectMeta

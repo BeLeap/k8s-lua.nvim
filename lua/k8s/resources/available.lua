@@ -1,4 +1,5 @@
 local client = require("k8s.api.client")
+local resources_util = require("k8s.resources.util")
 
 local M = {}
 
@@ -26,21 +27,13 @@ M.get_apis = function()
   return names
 end
 
----@param api string
+---@param api_group string
 ---@return string[]
-M.get_resources = function(api)
-  local path = ""
-
-  if api == "core" then
-    path = "/api/v1"
-  else
-    path = "/apis/" .. api
-  end
-
-  local result = client.get(path)
+M.get_resources = function(api_group)
+  local result = client.get(resources_util.path_mapper(api_group))
 
   if result == nil then
-    vim.notify("List " .. api .. " resources request failed", vim.log.levels.ERROR)
+    vim.notify("List " .. api_group .. " resources request failed", vim.log.levels.ERROR)
 
     return {}
   end
@@ -58,5 +51,33 @@ M.get_resources = function(api)
   end
 
   return names
+end
+
+---@param api_group string
+---@param kind string
+---@return boolean
+M.is_namespaced = function(api_group, kind)
+  local result = client.get(resources_util.path_mapper(api_group))
+  if result == nil then
+    vim.notify("List " .. api_group .. " resources request failed", vim.log.levels.ERROR)
+
+    return {}
+  end
+
+  local resources = {}
+  for k, v in pairs(result) do
+    if k == "resources" then
+      resources = v
+    end
+  end
+
+  local namespaced = false
+  for _, v in ipairs(resources) do
+    if v.name == kind then
+      namespaced = v.namespaced
+    end
+  end
+
+  return namespaced
 end
 return M
