@@ -13,7 +13,7 @@ local M = {
 ---@return LanguageTree
 ---@return TSTree
 M.load_config = function()
-  local content = utils.readfile(vim.fs.normalize(config.kube_config.location or "~/.kube/config"))
+  local content = utils.readfile(vim.fs.normalize(config.kube_config.location))
 
   vim.treesitter.language.add("yaml")
   local parser = vim.treesitter.get_string_parser(content, "yaml")
