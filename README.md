@@ -29,26 +29,46 @@ Thank you for your understanding!
 
 ## Available Commands
 
-Given aliases,
-
-```lua
-local aliases = {
-    ["context"] = {
-        "ctx",
-        "contexts",
-    },
-}
-```
-
-Following command works.
+### `Kube`
 
 ```vim
-Kube context
-Kube ctx
-Kube contexts
+Kube <api_group> <kind>
 ```
 
-To see full list of aliases, See [this code](lua/k8s/commands.lua#L1-L26)
+For example, following commands works.
+
+```vim
+Kube core pods
+```
+
+```vim
+Kube networking.istio.io/v1beta1 virtualservices
+```
+
+Additionally, I treated context as a core api_group.
+If there is any better idea, please let me know.
+
+Therefore, following command works.
+
+```vim
+Kube core contexts
+```
+
+All commands address above shows list view.
+List view has some keymaps.
+
+| mode | key | action                                         | note                           |
+|:-----|:----|:-----------------------------------------------|:-------------------------------|
+| n    | e   | Edit resource under cursor if available        |                                |
+| n    | d   | Request deletion under cursor if available     |                                |
+| v    | d   | Request deletion under selection if available  |                                |
+| n    | s   | Select under cursor if available               | Works for contexts, namespaces |
+| n    | r   | Reload list view                               |                                |
+| n    | l   | Show logs                                      | Works for pods                 |
+
+### `KubeApply`
+
+It runs `kubectl apply -f <buffer>` instead of you.
 
 ## Contributing
 
