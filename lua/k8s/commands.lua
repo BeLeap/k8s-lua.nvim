@@ -25,7 +25,7 @@ local M = {
       opts = {
         nargs = "*",
         complete = function(arglead, line)
-          local args = vim.split(line, " ")
+          local args = vim.split(line, "%s+")
 
           if #args == 2 then
             return autocompleter.apis_completer(arglead)
