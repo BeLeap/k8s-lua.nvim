@@ -1,4 +1,3 @@
-local pickers = require("k8s.ui.pickers")
 local buffer = require("k8s.ui.buffer")
 local resources = require("k8s.resources.pod")
 local global_contexts = require("k8s.global_contexts")
