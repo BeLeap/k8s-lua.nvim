@@ -40,7 +40,7 @@ For example, following commands works.
 - `Kube core pods`
 - `Kube networking.istio.io/v1beta1 virtualservices`
 
-Additionally, I treated context as a core api_group.
+Additionally, I treated context as a core `api_group`.
 If there is any better idea, please let me know.
 
 Therefore, following command works.
