@@ -37,22 +37,15 @@ Kube <api_group> <kind>
 
 For example, following commands works.
 
-```vim
-Kube core pods
-```
-
-```vim
-Kube networking.istio.io/v1beta1 virtualservices
-```
+- `Kube core pods`
+- `Kube networking.istio.io/v1beta1 virtualservices`
 
 Additionally, I treated context as a core api_group.
 If there is any better idea, please let me know.
 
 Therefore, following command works.
 
-```vim
-Kube core contexts
-```
+- `Kube core contexts`
 
 All commands address above shows list view.
 List view has some keymaps.
