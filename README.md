@@ -48,7 +48,7 @@ Therefore, following command works.
 - `Kube core contexts`
 
 All commands address above shows list view.
-List view has some keymaps.
+List view has following keymaps.
 
 | mode | key | action                                         | note                           |
 |:-----|:----|:-----------------------------------------------|:-------------------------------|
