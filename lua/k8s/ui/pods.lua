@@ -2,13 +2,14 @@ local pickers = require("k8s.ui.pickers")
 local buffer = require("k8s.ui.buffer")
 local resources = require("k8s.resources.pod")
 local global_contexts = require("k8s.global_contexts")
+local NamespacedResourcePicker = require("k8s.ui.pickers.namespaced")
 
 local M = {}
 
 M.select = function()
   local pods = resources:new("pods", "core", true, global_contexts.selected_namespace)
 
-  pickers:new(pods, {
+  NamespacedResourcePicker:new(pods, {
     entry_modifier = function(picker_buffer, index, object)
       local pod = object --[[@as Pod]]
 

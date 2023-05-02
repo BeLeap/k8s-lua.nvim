@@ -2,9 +2,6 @@ local client = require("k8s.api.client")
 local resources_util = require("k8s.resources.util")
 
 ---@class KubernetesResources: Resources
----@field public api_group string
----@field public is_namespaced boolean
----@field public namespace string|nil
 local KubernetesResources = {}
 
 ---@param kind string

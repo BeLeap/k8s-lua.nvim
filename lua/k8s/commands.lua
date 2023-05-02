@@ -2,7 +2,8 @@ local global_contexts = require("k8s.global_contexts")
 local autocompleter = require("k8s.autocompleter")
 local resources = require("k8s.resources")
 local available = require("k8s.resources.available")
-local pickers = require("k8s.ui.pickers")
+local ResourcePicker = require("k8s.ui.pickers")
+local NamespacedResourcePicker = require("k8s.ui.pickers.namespaced")
 
 local predefined = {
   core = {
@@ -47,10 +48,16 @@ local M = {
         if predefined[api_group] ~= nil and predefined[api_group][kind] then
           predefined[api_group][kind].select()
         else
-          local resource =
-            resources:new(kind, api_group, available.is_namespaced(api_group, kind), global_contexts.selected_namespace)
+          local is_namespaced = available.is_namespaced(api_group, kind)
+          if is_namespaced then
+            local resource = resources:new(kind, api_group, true, global_contexts.selected_namespace)
 
-          pickers:new(resource)
+            NamespacedResourcePicker:new(resource)
+          else
+            local resource = resources:new(kind, api_group, false, nil)
+
+            ResourcePicker:new(resource)
+          end
         end
       end,
     },

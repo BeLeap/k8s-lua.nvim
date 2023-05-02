@@ -8,6 +8,8 @@
 ---@class Resources
 ---@field public kind string
 ---@field public api_group string
+---@field public is_namespaced boolean
+---@field public namespace string|nil
 ---@field public build_fqdn fun(self: Resources, namespace: string|nil): string
 ---@field public get ((fun(self: Resources, name: string): KubernetesObject|nil)|nil)
 ---@field public list fun(self: Resources): KubernetesObject[]|nil
