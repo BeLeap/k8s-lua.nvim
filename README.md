@@ -55,7 +55,7 @@ List view has some keymaps.
 | n    | e   | Edit resource under cursor if available        |                                |
 | n    | d   | Request deletion under cursor if available     |                                |
 | v    | d   | Request deletion under selection if available  |                                |
-| n    | s   | Select under cursor if available               | Works for contexts, namespaces |
+| n    | s   | Select under cursor                            | Works for contexts, namespaces |
 | n    | r   | Reload list view                               |                                |
 | n    | l   | Show logs                                      | Works for pods                 |
 
