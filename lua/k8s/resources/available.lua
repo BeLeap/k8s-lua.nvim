@@ -4,24 +4,22 @@ local resources_util = require("k8s.resources.util")
 local M = {}
 
 M.get_apis = function()
+  local names = { "core" }
   local result = client.get("/apis")
 
-  if result == nil then
-    vim.notify("List apis request failed", vim.log.levels.ERROR)
-
-    return {}
-  end
-
-  local groups = {}
-  for k, v in pairs(result) do
-    if k == "groups" then
-      groups = v
+  if result ~= nil then
+    local groups = {}
+    for k, v in pairs(result) do
+      if k == "groups" then
+        groups = v
+      end
     end
-  end
 
-  local names = { "core" }
-  for _, v in ipairs(groups) do
-    table.insert(names, v.preferredVersion.groupVersion)
+    for _, v in ipairs(groups) do
+      table.insert(names, v.preferredVersion.groupVersion)
+    end
+  else
+    vim.notify("List apis request failed", vim.log.levels.ERROR)
   end
 
   return names
@@ -30,24 +28,22 @@ end
 ---@param api_group string
 ---@return string[]
 M.get_resources = function(api_group)
+  local names = {}
   local result = client.get(resources_util.path_mapper(api_group))
 
-  if result == nil then
-    vim.notify("List " .. api_group .. " resources request failed", vim.log.levels.ERROR)
-
-    return {}
-  end
-
-  local resources = {}
-  for k, v in pairs(result) do
-    if k == "resources" then
-      resources = v
+  if result ~= nil then
+    local resources = {}
+    for k, v in pairs(result) do
+      if k == "resources" then
+        resources = v
+      end
     end
-  end
 
-  local names = {}
-  for _, v in ipairs(resources) do
-    table.insert(names, v.name)
+    for _, v in ipairs(resources) do
+      table.insert(names, v.name)
+    end
+  else
+    vim.notify("List " .. api_group .. " resources request failed", vim.log.levels.ERROR)
   end
 
   if api_group == "core" then

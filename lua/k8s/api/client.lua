@@ -57,7 +57,7 @@ M.get_raw_body = function(path, query_param)
 
   local res = curl.get(url)
 
-  if res ~= nil then
+  if res ~= nil and res.status == 200 then
     return res.body
   end
 end
