@@ -27,6 +27,10 @@ Thank you for your understanding!
 }
 ```
 
+## Screenshot
+
+![k8s-lua.nvim screenshot](./assets/k8s-lua-screenshot.png)
+
 ## Available Commands
 
 ### `Kube`
