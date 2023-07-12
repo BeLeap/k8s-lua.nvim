@@ -9,7 +9,11 @@ local GlobalContext = {
 }
 
 GlobalContext.setup = function()
-  GlobalContext.selected_contexts = context.get_current()
+  local current_context = context.get_current()
+  if current_context == nil then
+    current_context = context.list()[0]
+  end
+  GlobalContext.selected_contexts = current_context
 end
 
 return GlobalContext

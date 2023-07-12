@@ -4,7 +4,7 @@ local resources_util = require("k8s.resources.util")
 local M = {}
 
 M.get_apis = function()
-  local names = { "core" }
+  local names = { "config", "core" }
   local result = client.get("/apis")
 
   if result ~= nil then
@@ -46,7 +46,7 @@ M.get_resources = function(api_group)
     vim.notify("List " .. api_group .. " resources request failed", vim.log.levels.ERROR)
   end
 
-  if api_group == "core" then
+  if api_group == "config" then
     table.insert(names, "contexts")
   end
 

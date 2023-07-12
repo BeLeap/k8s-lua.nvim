@@ -6,8 +6,10 @@ local ResourcePicker = require("k8s.ui.pickers")
 local NamespacedResourcePicker = require("k8s.ui.pickers.namespaced")
 
 local predefined = {
-  core = {
+  config = {
     contexts = require("k8s.ui.contexts"),
+  },
+  core = {
     namespaces = require("k8s.ui.namespaces"),
     pods = require("k8s.ui.pods"),
     services = require("k8s.ui.services"),
