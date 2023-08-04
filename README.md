@@ -13,6 +13,10 @@ Thank you for your understanding!
 
 ## Installation
 
+### Requirements
+
+- `kubectl` should be installed.
+
 ### [lazy.nvim](https://github.com/folke/lazy.nvim)
 
 ```lua
@@ -39,7 +43,7 @@ Thank you for your understanding!
 Kube <api_group> <kind>
 ```
 
-For example, following commands works.
+For example, following commands work.
 
 - `Kube core pods`
 - `Kube networking.istio.io/v1beta1 virtualservices`
@@ -51,8 +55,8 @@ Therefore, following command works.
 
 - `Kube config contexts`
 
-All commands address above shows list view.
-List view has following keymaps.
+All commands address above show a list view.
+The list view has following keymaps.
 
 | mode | key | action                                         | note                           |
 |:-----|:----|:-----------------------------------------------|:-------------------------------|
