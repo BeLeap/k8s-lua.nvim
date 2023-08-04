@@ -28,6 +28,10 @@ end
 ---@param api_group string
 ---@return string[]
 M.get_resources = function(api_group)
+  if api_group == "config" then
+    return { "contexts" }
+  end
+
   local names = {}
   local result = client.get(resources_util.path_mapper(api_group))
 
@@ -44,10 +48,6 @@ M.get_resources = function(api_group)
     end
   else
     vim.notify("List " .. api_group .. " resources request failed", vim.log.levels.ERROR)
-  end
-
-  if api_group == "config" then
-    table.insert(names, "contexts")
   end
 
   return names
