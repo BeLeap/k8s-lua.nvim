@@ -1,7 +1,4 @@
 local M = {
-  kube_config = {
-    location = "~/.kube/config",
-  },
   resources = {
     pod = {
       log = {

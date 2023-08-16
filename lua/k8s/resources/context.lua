@@ -1,4 +1,3 @@
-local kube_config = require("k8s.kube_config")
 local Job = require("plenary.job")
 
 ---@class ContextResources: Resources
